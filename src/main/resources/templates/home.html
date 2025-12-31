@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Sayfa - Blog Projesi</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --gray-900: #0f172a;
+            --gray-800: #1e293b;
+            --gray-700: #334155;
+            --gray-600: #475569;
+            --gray-500: #64748b;
+            --gray-400: #94a3b8;
+            --gray-300: #cbd5e1;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+            --gray-50: #f8fafc;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #faf8ff 0%, var(--gray-50) 100%);
+            color: var(--gray-800);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--gray-100); }
+        ::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 16px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary) !important;
+            text-decoration: none;
+        }
+
+        .navbar-brand .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            color: var(--gray-600) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary) !important;
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .profile-dropdown { position: relative; }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .dropdown-menu-custom {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 280px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--gray-200);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .dropdown-menu-custom.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .dropdown-header .user-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+        .dropdown-header .user-email { font-size: 0.85rem; opacity: 0.9; }
+
+        .dropdown-body { padding: 12px; }
+
+        .dropdown-item-custom {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .dropdown-item-custom:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .dropdown-item-custom i { width: 20px; text-align: center; }
+        .dropdown-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
+        .dropdown-item-custom.logout { color: var(--danger); }
+        .dropdown-item-custom.logout:hover { background: #fef2f2; }
+
+        /* Auth Buttons */
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-login {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-register {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-register:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Main Content */
+        .main-content { padding-top: 100px; min-height: 100vh; }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            padding: 80px 0;
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: bgMove 20s ease infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+        }
+
+        .hero-content { position: relative; z-index: 1; text-align: center; color: white; }
+        .hero-title { 
+            font-size: 3.5rem; 
+            font-weight: 800; 
+            margin-bottom: 20px; 
+            animation: fadeInUp 0.8s ease;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .hero-subtitle { 
+            font-size: 1.25rem; 
+            opacity: 0.95; 
+            max-width: 600px; 
+            margin: 0 auto 30px; 
+            animation: fadeInUp 0.8s ease 0.1s both;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .hero-search { max-width: 500px; margin: 0 auto; animation: fadeInUp 0.8s ease 0.2s both; }
+        .search-input-wrapper { position: relative; }
+        .search-input-wrapper input {
+            width: 100%; padding: 18px 24px 18px 54px; border: none; border-radius: 16px;
+            font-size: 1rem; background: rgba(255, 255, 255, 0.95); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px); transition: all 0.3s ease;
+        }
+        .search-input-wrapper input:focus { 
+            outline: none; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 4px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .search-input-wrapper i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section */
+        .section-header { 
+            display: flex; 
+            flex-wrap: wrap;
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+        .section-title { 
+            font-size: 2rem; 
+            font-weight: 800; 
+            color: var(--gray-900);
+            letter-spacing: -0.02em;
+        }
+        .section-title span { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            background-size: 200% auto;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            background: white;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Post Grid */
+        .posts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 32px;
+        }
+        @media (max-width: 1200px) { .posts-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .posts-grid { grid-template-columns: 1fr; } .hero-title { font-size: 2.5rem; } }
+
+        /* Post Card */
+        .post-card {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease both;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .post-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+        .post-card:nth-child(1) { animation-delay: 0.1s; }
+        .post-card:nth-child(2) { animation-delay: 0.2s; }
+        .post-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .post-image { 
+            position: relative; 
+            height: 200px; 
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+        .post-image img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .post-card:hover .post-image img { 
+            transform: scale(1.1) rotate(1deg); 
+        }
+
+        .post-image-placeholder {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 3rem;
+        }
+
+        .post-category {
+            position: absolute; top: 16px; left: 16px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .post-card:hover .post-category {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .post-body { padding: 24px; }
+
+        .post-author { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            object-fit: cover;
+        }
+        img.author-avatar {
+            background: none;
+        }
+        .author-info { flex: 1; }
+        .author-name { font-weight: 600; color: var(--gray-900); font-size: 0.95rem; }
+        .author-name a {
+            color: var(--gray-900);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .author-name a:hover {
+            color: var(--primary);
+        }
+        .post-date { font-size: 0.85rem; color: var(--gray-500); }
+
+        .post-title { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--gray-900); 
+            margin-bottom: 12px; 
+            line-height: 1.4; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden;
+            letter-spacing: -0.01em;
+        }
+        .post-title a { 
+            color: inherit; 
+            text-decoration: none; 
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, var(--primary), var(--primary)) no-repeat;
+            background-size: 0% 2px;
+            background-position: left bottom;
+        }
+        .post-card:hover .post-title a { 
+            color: var(--primary);
+            background-size: 100% 2px;
+        }
+
+        .post-excerpt { font-size: 0.95rem; color: var(--gray-600); margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.7; }
+
+        .post-stats { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            padding-top: 20px; 
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+        }
+        .stat-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-size: 0.9rem; 
+            color: var(--gray-500);
+            transition: color 0.2s ease;
+        }
+        
+        .stat-item:hover {
+            color: var(--primary);
+        }
+
+        .post-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .post-rating .stars {
+            display: flex;
+            gap: 2px;
+            color: #fbbf24;
+        }
+
+        .post-rating .rating-value {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .post-rating .rating-count {
+            color: var(--gray-400);
+            font-size: 0.85rem;
+        }
+
+        .post-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+        .action-btn {
+            width: 38px; height: 38px; border-radius: 10px; border: none;
+            background: var(--gray-100); color: var(--gray-600);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .action-btn:hover { 
+            background: var(--primary); 
+            color: white; 
+            transform: scale(1.1); 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .action-btn.bookmarked { background: var(--primary); color: white; }
+
+        /* Load More */
+        .load-more-section { text-align: center; padding: 60px 0; }
+        .btn-load-more {
+            padding: 16px 40px; font-size: 1rem; font-weight: 600;
+            color: var(--primary); background: var(--white);
+            border: 2px solid var(--primary); border-radius: 14px;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-load-more:hover {
+            background: var(--primary); color: white;
+            transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.25);
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white; border: none; font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            z-index: 999;
+            display: flex; align-items: center; justify-content: center; text-decoration: none;
+            animation: fabPulse 2s ease-in-out infinite;
+        }
+        .fab:hover { 
+            transform: scale(1.15) rotate(-5deg); 
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6); 
+            color: white;
+            animation: none;
+        }
+        
+        @keyframes fabPulse {
+            0%, 100% { box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 8px 35px rgba(99, 102, 241, 0.6); }
+        }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 100px; right: 30px; z-index: 1000; }
+        .toast-notification {
+            padding: 16px 24px; background: var(--gray-900); color: white;
+            border-radius: 12px; box-shadow: var(--shadow-xl);
+            display: flex; align-items: center; gap: 12px;
+            transform: translateX(400px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast-notification.show { transform: translateX(0); opacity: 1; }
+        .toast-notification.success { background: var(--success); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-state i { font-size: 5rem; color: var(--gray-300); margin-bottom: 20px; }
+        .empty-state h3 { font-size: 1.5rem; color: var(--gray-700); margin-bottom: 10px; }
+        .empty-state p { color: var(--gray-500); }
+
+        /* Mobile */
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--gray-700); cursor: pointer; }
+        @media (max-width: 992px) {
+            .mobile-menu-btn { display: block; }
+            .nav-menu {
+                position: fixed; top: 76px; left: 0; right: 0;
+                background: var(--white); flex-direction: column; padding: 20px;
+                box-shadow: var(--shadow-lg); transform: translateY(-100%);
+                opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            }
+            .nav-menu.show { transform: translateY(0); opacity: 1; visibility: visible; }
+            .nav-link { width: 100%; justify-content: center; }
+        }
+
+        /* Footer */
+        .footer { background: var(--gray-900); color: var(--gray-400); padding: 40px 0; margin-top: 80px; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { font-size: 1.2rem; font-weight: 700; color: var(--white); }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { color: var(--gray-400); text-decoration: none; transition: color 0.3s ease; }
+        .footer-links a:hover { color: var(--primary); }
+        @media (max-width: 768px) { .footer-content { flex-direction: column; gap: 20px; text-align: center; } }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar(activePage='home')}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">En Son Yazılar</h1>
+                    <p class="hero-subtitle">Topluluk tarafından paylaşılan en güncel yazıları, hikayeleri ve düşünceleri keşfedin.</p>
+                    <div class="hero-search">
+                        <form th:action="@{/home}" method="get" id="searchForm">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="search" id="searchInput" placeholder="Yazı ara..." th:value="${searchQuery}">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span th:if="${selectedCategory != null}" th:text="'#' + ${selectedCategory}">Tüm</span>
+                    <span th:if="${selectedCategory == null}">Tüm</span> Yazılar
+                </h2>
+                
+                <div class="filter-controls">
+                    <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
+                        <option value="">Tüm Kategoriler</option>
+                        <option value="Teknoloji">Teknoloji</option>
+                        <option value="Yazılım">Yazılım</option>
+                        <option value="Tasarım">Tasarım</option>
+                        <option value="İş">İş</option>
+                        <option value="Yaşam">Yaşam</option>
+                        <option value="Seyahat">Seyahat</option>
+                    </select>
+                    
+                    <select class="filter-select" id="sortBy" onchange="applyFilters()">
+                        <option value="latest">En Yeni</option>
+                        <option value="popular">En Çok Görüntülenen</option>
+                        <option value="top-rated">En Çok Puan Alan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="posts-grid" th:if="${posts != null and !posts.empty}">
+                <article class="post-card" th:each="post : ${posts}" onclick="window.location.href='/post/' + this.dataset.postId" th:data-post-id="${post.id}" style="cursor: pointer;">
+                    <div class="post-image">
+                        <!-- Resim varsa göster -->
+                        <img th:if="${post.imageUrl != null and !post.imageUrl.isEmpty()}" 
+                             th:src="${post.imageUrl}" 
+                             th:alt="${post.title}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <!-- Resim yoksa veya yüklenemezse placeholder göster -->
+                        <div class="post-image-placeholder" 
+                             th:style="${post.imageUrl != null and !post.imageUrl.isEmpty()} ? 'display:none' : ''">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <span class="post-category" th:text="${post.category} ?: 'Genel'">Kategori</span>
+                    </div>
+                    <div class="post-body">
+                        <div class="post-author">
+                            <img th:if="${post.author.profileImageUrl != null}" 
+                                 th:src="${post.author.profileImageUrl}" 
+                                 class="author-avatar"
+                                 alt="Avatar">
+                            <div th:if="${post.author.profileImageUrl == null}" 
+                                 class="author-avatar" 
+                                 th:text="${post.author.initials}">A</div>
+                            <div class="author-info">
+                                <div class="author-name">
+                                    <a th:href="@{/profile/{username}(username=${post.author.username})}"
+                                       th:text="${post.author.displayName}">Yazar Adı</a>
+                                </div>
+                                <div class="post-date" th:text="${post.relativeTime}">2 gün önce</div>
+                            </div>
+                        </div>
+                        <h3 class="post-title">
+                            <span th:text="${post.title}">Yazı Başlığı</span>
+                        </h3>
+                        <p class="post-excerpt" th:text="${post.excerpt}">Yazı özeti...</p>
+                        <div class="post-stats">
+                            <div class="post-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, post.averageRating >= 1 ? post.averageRating.intValue() : 0)}"></i>
+                                    <i class="far fa-star" th:each="i : ${#numbers.sequence(1, 5 - (post.averageRating >= 1 ? post.averageRating.intValue() : 0))}"></i>
+                                </div>
+                                <span class="rating-value" th:text="${#numbers.formatDecimal(post.averageRating, 1, 1)}">0.0</span>
+                                <span class="rating-count" th:text="'(' + ${post.ratingCount} + ')'"> (0)</span>
+                            </div>
+                            <span class="stat-item"><i class="fas fa-comment"></i> <span th:text="${post.commentCount}">0</span></span>
+                            <span class="stat-item"><i class="fas fa-eye"></i> <span th:text="${post.viewCount}">0</span></span>
+                            <div class="post-actions" onclick="event.stopPropagation();">
+                                <form th:action="@{/post/{id}/bookmark(id=${post.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="action-btn" title="Yer İmlerine Ekle"><i class="fas fa-bookmark"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="empty-state" th:if="${posts == null or posts.empty}">
+                <i class="fas fa-newspaper"></i>
+                <h3>Henüz yazı yok</h3>
+                <p>İlk yazıyı sen paylaş!</p>
+                <a th:href="@{/write}" class="btn-load-more mt-4" style="display: inline-block;"><i class="fas fa-pen me-2"></i>Yeni Yazı Yaz</a>
+            </div>
+
+            <div class="load-more-section" th:if="${posts != null and !posts.empty}">
+                <button class="btn-load-more" onclick="loadMore()"><i class="fas fa-sync-alt me-2"></i>Daha Fazla Yükle</button>
+            </div>
+        </section>
+    </main>
+
+    <a th:if="${isAuthenticated}" th:href="@{/write}" class="fab" title="Yeni Yazı Yaz (N)"><i class="fas fa-pen"></i></a>
+
+    <div class="toast-container" id="toastContainer">
+        <div class="toast-notification" id="toast">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">İşlem başarılı!</span>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand"><i class="fas fa-feather-alt me-2"></i>Blog Projesi</div>
+                <div class="footer-links">
+                    <a href="#">Hakkında</a>
+                    <a href="#">Gizlilik</a>
+                    <a href="#">Kullanım Şartları</a>
+                    <a href="#">İletişim</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('navMenu').classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('profileDropdown');
+            const avatar = document.querySelector('.profile-avatar');
+            if (dropdown && avatar && !dropdown.contains(e.target) && !avatar.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.className = 'toast-notification ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function loadMore() {
+            const btn = document.querySelector('.btn-load-more');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yükleniyor...';
+            btn.disabled = true;
+            setTimeout(() => {
+                showToast('Tüm yazılar yüklendi!', 'success');
+                btn.innerHTML = '<i class="fas fa-check me-2"></i>Tümü Yüklendi';
+            }, 1500);
+        }
+
+        // Filtreleme ve sıralama fonksiyonu
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            const url = new URL(window.location.href);
+            if (category) {
+                url.searchParams.set('category', category);
+            } else {
+                url.searchParams.delete('category');
+            }
+            if (sortBy && sortBy !== 'latest') {
+                url.searchParams.set('sort', sortBy);
+            } else {
+                url.searchParams.delete('sort');
+            }
+            
+            window.location.href = url.toString();
+        }
+
+        // Sayfa yüklendiğinde filtreleri ayarla
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            const sort = urlParams.get('sort');
+            
+            if (category) {
+                document.getElementById('categoryFilter').value = category;
+            }
+            if (sort) {
+                document.getElementById('sortBy').value = sort;
+            }
+        });
+
+        // Anlık arama filtresi
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const postCards = document.querySelectorAll('.post-card');
+            
+            if (searchInput && postCards.length > 0) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+                    
+                    postCards.forEach(card => {
+                        const title = card.querySelector('.post-title')?.textContent.toLowerCase() || '';
+                        const excerpt = card.querySelector('.post-excerpt')?.textContent.toLowerCase() || '';
+                        const category = card.querySelector('.post-category')?.textContent.toLowerCase() || '';
+                        const author = card.querySelector('.author-name')?.textContent.toLowerCase() || '';
+                        
+                        const matches = title.includes(searchTerm) || 
+                                      excerpt.includes(searchTerm) || 
+                                      category.includes(searchTerm) ||
+                                      author.includes(searchTerm);
+                        
+                        if (matches) {
+                            card.style.display = '';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    // Sonuç yoksa mesaj göster
+                    const emptyState = document.querySelector('.empty-state');
+                    const postsGrid = document.querySelector('.posts-grid');
+                    
+                    if (visibleCount === 0 && searchTerm) {
+                        if (emptyState) {
+                            emptyState.style.display = 'block';
+                            emptyState.querySelector('h3').textContent = 'Sonuç bulunamadı';
+                            emptyState.querySelector('p').textContent = `"${searchTerm}" için sonuç bulunamadı.`;
+                        }
+                        if (postsGrid) postsGrid.style.display = 'none';
+                    } else {
+                        if (emptyState) emptyState.style.display = 'none';
+                        if (postsGrid) postsGrid.style.display = '';
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.key === 'n' || e.key === 'N') && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+                window.location.href = '/write';
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('profileDropdown')?.classList.remove('show');
+                document.getElementById('navMenu')?.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

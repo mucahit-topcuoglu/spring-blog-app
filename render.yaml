@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: spring-blog-app
+    env: java
+    buildCommand: ./gradlew build -x test
+    startCommand: java -jar build/libs/*.jar
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: production

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Navbar Fragment</title>
+</head>
+<body>
+    <!-- Navbar Fragment -->
+    <nav class="navbar" id="navbar" th:fragment="navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" th:href="@{/home}">
+                    <div class="logo-icon"><i class="fas fa-feather-alt"></i></div>
+                    Blog Projesi
+                </a>
+
+                <button class="mobile-menu-btn d-lg-none" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <ul class="nav-menu d-none d-lg-flex">
+                    <li><a class="nav-link" th:href="@{/home}" th:classappend="${activePage == 'home'} ? 'active' : ''"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                    <li><a class="nav-link" th:href="@{/topics}" th:classappend="${activePage == 'topics'} ? 'active' : ''"><i class="fas fa-th-large"></i> Konular</a></li>
+                    <li th:if="${isAuthenticated}"><a class="nav-link" th:href="@{/write}" th:classappend="${activePage == 'write'} ? 'active' : ''"><i class="fas fa-pen"></i> Yaz</a></li>
+                    <li th:if="${isAuthenticated}"><a class="nav-link" th:href="@{/my-posts}" th:classappend="${activePage == 'my-posts'} ? 'active' : ''"><i class="fas fa-file-alt"></i> Yazılarım</a></li>
+                    <li th:if="${isAuthenticated}"><a class="nav-link" th:href="@{/drafts}" th:classappend="${activePage == 'drafts'} ? 'active' : ''"><i class="fas fa-file-pen"></i> Taslaklar</a></li>
+                    <li th:if="${isAuthenticated}"><a class="nav-link" th:href="@{/bookmarks}" th:classappend="${activePage == 'bookmarks'} ? 'active' : ''"><i class="fas fa-bookmark"></i> Yer İmleri</a></li>
+                </ul>
+
+                <div class="profile-dropdown d-none d-lg-block" th:if="${currentUser != null}">
+                    <img th:if="${currentUser.profileImageUrl != null}" 
+                         th:src="${currentUser.profileImageUrl}" 
+                         class="profile-avatar" 
+                         onclick="toggleDropdown()" 
+                         alt="Profile">
+                    <div th:if="${currentUser.profileImageUrl == null}" 
+                         class="profile-avatar" 
+                         onclick="toggleDropdown()" 
+                         th:text="${userInitials}">U</div>
+                    <div class="dropdown-menu-custom" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <div class="user-name" th:text="${currentUser.displayName}">Kullanıcı Adı</div>
+                            <div class="user-email" th:text="${currentUser.email}">email@example.com</div>
+                        </div>
+                        <div class="dropdown-body">
+                            <a th:href="@{/profile}" class="dropdown-item-custom"><i class="fas fa-user"></i> Profilim</a>
+                            <a th:href="@{/settings}" class="dropdown-item-custom"><i class="fas fa-cog"></i> Ayarlar</a>
+                            <div class="dropdown-divider"></div>
+                            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                <button type="submit" class="dropdown-item-custom logout" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Login/Register buttons for non-authenticated users -->
+                <div class="auth-buttons d-none d-lg-flex" th:unless="${isAuthenticated}">
+                    <a th:href="@{/login}" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                    </a>
+                    <a th:href="@{/register}" class="btn-register">
+                        <i class="fas fa-user-plus"></i> Kayıt Ol
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
