@@ -1,30 +1,25 @@
-# Build stage
-FROM eclipse-temurin:17-jdk-alpine AS build
-WORKDIR /app
+# Use official Gradle image with JDK 17
+FROM gradle:8.5-jdk17 AS build
 
-# Copy gradle wrapper and build files
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
-COPY gradle.properties .
+# Set working directory
+WORKDIR /home/gradle/project
 
-# Make gradlew executable
-RUN chmod +x gradlew
-
-# Copy source code
-COPY src src
+# Copy all project files
+COPY --chown=gradle:gradle . .
 
 # Build the application
-RUN ./gradlew build -x test --no-daemon
+RUN gradle build -x test --no-daemon
 
-# Run stage
+# Use JRE for runtime
 FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
 
-# Render uses PORT environment variable
-ENV PORT=8080
-EXPOSE $PORT
+# Copy the built jar from build stage
+COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
 
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
+# Expose port
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
