@@ -1,8 +1,22 @@
 # Build stage
-FROM gradle:8.5-jdk17 AS build
+FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-COPY . .
-RUN gradle build -x test --no-daemon
+
+# Copy gradle wrapper and build files
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY gradle.properties .
+
+# Make gradlew executable
+RUN chmod +x gradlew
+
+# Copy source code
+COPY src src
+
+# Build the application
+RUN ./gradlew build -x test --no-daemon
 
 # Run stage
 FROM eclipse-temurin:17-jre-alpine
