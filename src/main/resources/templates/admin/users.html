@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcılar - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Users Content -->
+            <div class="content-area">
+                <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h1><i class="fas fa-users"></i> Kullanıcı Yönetimi</h1>
+                        <p>Sistemdeki tüm kullanıcıları yönetin</p>
+                    </div>
+                    <a th:href="@{/admin/users/new}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Yeni Kullanıcı
+                    </a>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Başarılı!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body py-3">
+                        <form th:action="@{/admin/users}" method="get" class="d-flex gap-3 flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" name="search" class="form-control" 
+                                           placeholder="Kullanıcı adı veya e-posta ara..."
+                                           th:value="${searchQuery}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Ara</button>
+                            <a th:href="@{/admin/users}" class="btn btn-outline-secondary">Temizle</a>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> Kullanıcı Listesi</h5>
+                        <span class="badge bg-secondary" th:text="${totalElements != null ? totalElements + ' kullanıcı' : #lists.size(users) + ' kullanıcı'}">0 kullanıcı</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Kullanıcı</th>
+                                        <th>E-posta</th>
+                                        <th>Rol</th>
+                                        <th>Durum</th>
+                                        <th>Kayıt Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}" th:data-href="@{/admin/users/{id}(id=${user.id})}">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="user-avatar bg-primary text-white" th:if="${user.profileImageUrl == null}"
+                                                     th:text="${user.initials}">U</div>
+                                                <img th:if="${user.profileImageUrl != null}" 
+                                                     th:src="${user.profileImageUrl}"
+                                                     class="user-avatar-img" alt="Avatar">
+                                                <div>
+                                                    <div class="fw-semibold" th:text="${user.displayName}">İsim</div>
+                                                    <small class="text-muted" th:text="'@' + ${user.username}">@username</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td th:text="${user.email}">email@example.com</td>
+                                        <td>
+                                            <span class="status-badge status-admin" th:if="${user.role.name() == 'ADMIN'}">
+                                                <i class="fas fa-shield-alt me-1"></i> Admin
+                                            </span>
+                                            <span class="status-badge status-user" th:if="${user.role.name() == 'USER'}">
+                                                <i class="fas fa-user me-1"></i> Kullanıcı
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-active" th:if="${user.enabled}">
+                                                <i class="fas fa-check me-1"></i> Aktif
+                                            </span>
+                                            <span class="status-badge status-inactive" th:unless="${user.enabled}">
+                                                <i class="fas fa-ban me-1"></i> Pasif
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">01.01.2024</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a th:href="@{/admin/users/{id}(id=${user.id})}" 
+                                                   class="btn-action btn-action-view" 
+                                                   data-bs-toggle="tooltip" title="Görüntüle">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" 
+                                                   class="btn-action btn-action-edit"
+                                                   data-bs-toggle="tooltip" title="Düzenle">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" 
+                                                      style="display: inline;" 
+                                                      th:if="${user.id != currentAdmin.id}"
+                                                      onsubmit="return confirmDelete('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                                                    <button type="submit" class="btn-action btn-action-delete" 
+                                                            data-bs-toggle="tooltip" title="Sil">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(users)}">
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Kullanıcı bulunamadı</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="card-footer" th:if="${totalPages != null && totalPages > 1}">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <li class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                                        <a class="page-link" th:href="@{/admin/users(page=${i})}" th:text="${i + 1}">1</a>
+                                    </li>
+                                </th:block>
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

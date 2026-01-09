@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Kullanıcı - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- New User Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2">
+                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/admin/users}">Kullanıcılar</a></li>
+                            <li class="breadcrumb-item active">Yeni Kullanıcı</li>
+                        </ol>
+                    </nav>
+                    <h1><i class="fas fa-user-plus"></i> Yeni Kullanıcı Oluştur</h1>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-edit"></i> Kullanıcı Bilgileri</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/users/new}" method="post">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Kullanıcı Adı <span class="text-danger">*</span></label>
+                                            <input type="text" name="username" class="form-control" 
+                                                   placeholder="Kullanıcı adı" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">E-posta <span class="text-danger">*</span></label>
+                                            <input type="email" name="email" class="form-control" 
+                                                   placeholder="email@example.com" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ad</label>
+                                            <input type="text" name="firstName" class="form-control" 
+                                                   placeholder="Ad">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Soyad</label>
+                                            <input type="text" name="lastName" class="form-control" 
+                                                   placeholder="Soyad">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Şifre <span class="text-danger">*</span></label>
+                                            <input type="password" name="password" class="form-control" 
+                                                   placeholder="Şifre" required minlength="6">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Rol <span class="text-danger">*</span></label>
+                                            <select name="role" class="form-select" required>
+                                                <option value="USER">Kullanıcı</option>
+                                                <option value="ADMIN">Admin</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4 d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Kullanıcı Oluştur
+                                        </button>
+                                        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i> İptal
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Bilgi</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Yeni kullanıcı oluştururken dikkat edilmesi gerekenler:</p>
+                                <ul class="text-muted small">
+                                    <li class="mb-2">Kullanıcı adı benzersiz olmalıdır</li>
+                                    <li class="mb-2">E-posta adresi benzersiz olmalıdır</li>
+                                    <li class="mb-2">Şifre en az 6 karakter olmalıdır</li>
+                                    <li class="mb-2">Admin rolü sistemdeki tüm yetkilere sahiptir</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

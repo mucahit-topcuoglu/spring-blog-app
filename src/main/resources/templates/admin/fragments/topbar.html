@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Topbar Fragment</title>
+</head>
+<body>
+    <!-- Admin Top Bar -->
+    <header class="topbar" th:fragment="topbar">
+        <div class="topbar-left">
+            <button class="mobile-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Ara...">
+            </div>
+        </div>
+        
+        <div class="topbar-right">
+            <!-- Maintenance Mode Badge -->
+            <div class="maintenance-badge" th:if="${isMaintenanceMode}">
+                <i class="fas fa-tools"></i>
+                Bakım Modu Aktif
+            </div>
+            
+            <!-- Admin Profile -->
+            <div class="admin-profile dropdown">
+                <div class="d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="admin-avatar" th:if="${currentAdmin?.profileImageUrl == null}" 
+                         th:text="${currentAdmin?.initials != null ? currentAdmin.initials : 'A'}">A</div>
+                    <img th:if="${currentAdmin?.profileImageUrl != null}" 
+                         th:src="${currentAdmin.profileImageUrl}" 
+                         class="admin-avatar" 
+                         style="object-fit: cover;"
+                         alt="Admin">
+                    <div class="admin-info d-none d-md-block">
+                        <div class="name" th:text="${currentAdmin?.displayName}">Admin</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <i class="fas fa-chevron-down ms-1"></i>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" th:href="@{/admin/settings}"><i class="fas fa-cog me-2"></i> Ayarlar</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/admin/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

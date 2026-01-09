@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşlem Logları - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+    
+    <style>
+        .log-item {
+            border-left: 4px solid #dee2e6;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+        .log-item:hover {
+            background: #e9ecef;
+        }
+        .log-item.log-login {
+            border-left-color: #48bb78;
+        }
+        .log-item.log-logout {
+            border-left-color: #667eea;
+        }
+        .log-item.log-user {
+            border-left-color: #4299e1;
+        }
+        .log-item.log-post {
+            border-left-color: #ed8936;
+        }
+        .log-item.log-settings {
+            border-left-color: #9f7aea;
+        }
+        .log-item.log-delete {
+            border-left-color: #f56565;
+        }
+        .log-time {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .log-action {
+            font-weight: 600;
+        }
+        .log-details {
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        .log-ip {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .filter-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+        }
+        .filter-card .form-select,
+        .filter-card .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .filter-card .form-select option {
+            background: #1a1a2e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Logs Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="fas fa-history"></i> İşlem Logları</h1>
+                    <p>Admin panel işlemlerinin geçmişi</p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="card filter-card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/admin/logs}" method="get" class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label">İşlem Tipi</label>
+                                <select class="form-select" name="actionType">
+                                    <option value="">Tümü</option>
+                                    <option value="LOGIN" th:selected="${actionType == 'LOGIN'}">Giriş</option>
+                                    <option value="LOGOUT" th:selected="${actionType == 'LOGOUT'}">Çıkış</option>
+                                    <option value="USER_CREATE" th:selected="${actionType == 'USER_CREATE'}">Kullanıcı Oluşturma</option>
+                                    <option value="USER_UPDATE" th:selected="${actionType == 'USER_UPDATE'}">Kullanıcı Güncelleme</option>
+                                    <option value="USER_DELETE" th:selected="${actionType == 'USER_DELETE'}">Kullanıcı Silme</option>
+                                    <option value="POST_PUBLISH" th:selected="${actionType == 'POST_PUBLISH'}">Post Yayınlama</option>
+                                    <option value="POST_UNPUBLISH" th:selected="${actionType == 'POST_UNPUBLISH'}">Post Geri Çekme</option>
+                                    <option value="POST_DELETE" th:selected="${actionType == 'POST_DELETE'}">Post Silme</option>
+                                    <option value="SETTINGS_UPDATE" th:selected="${actionType == 'SETTINGS_UPDATE'}">Ayar Değişikliği</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Admin</label>
+                                <select class="form-select" name="adminId">
+                                    <option value="">Tüm Adminler</option>
+                                    <option th:each="admin : ${admins}" 
+                                            th:value="${admin.id}" 
+                                            th:text="${admin.username}"
+                                            th:selected="${adminId == admin.id}">Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Başlangıç</label>
+                                <input type="date" class="form-control" name="startDate" th:value="${startDate}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Bitiş</label>
+                                <input type="date" class="form-control" name="endDate" th:value="${endDate}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-light w-100">
+                                    <i class="fas fa-filter me-2"></i> Filtrele
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Logs List -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> Son İşlemler</h5>
+                        <span class="badge bg-secondary" th:text="${#lists.size(logs) + ' kayıt'}">0 kayıt</span>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(logs)}" class="text-center py-5">
+                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">Henüz log kaydı bulunmuyor</p>
+                        </div>
+                        
+                        <div th:each="log : ${logs}" 
+                             th:classappend="${log.actionType.name().startsWith('LOGIN') ? 'log-login' : 
+                                              (log.actionType.name().startsWith('LOGOUT') ? 'log-logout' : 
+                                              (log.actionType.name().startsWith('USER') ? 'log-user' : 
+                                              (log.actionType.name().startsWith('POST') ? 'log-post' : 
+                                              (log.actionType.name().contains('DELETE') ? 'log-delete' : 'log-settings'))))}"
+                             class="log-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="log-action" th:text="${log.action}">İşlem</span>
+                                    <span class="text-muted">by</span>
+                                    <strong th:text="${log.adminUsername}">Admin</strong>
+                                </div>
+                                <div class="text-end">
+                                    <div class="log-time" th:text="${#temporals.format(log.createdAt, 'dd.MM.yyyy HH:mm:ss')}">
+                                        01.01.2024 12:00:00
+                                    </div>
+                                    <span class="log-ip" th:text="${log.ipAddress}">127.0.0.1</span>
+                                </div>
+                            </div>
+                            <div th:if="${log.details}" class="log-details mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span th:text="${log.details}">Detay</span>
+                            </div>
+                            <div th:if="${log.targetType}" class="mt-2">
+                                <small class="text-muted">
+                                    Hedef: <span th:text="${log.targetType}">Tip</span>
+                                    <span th:if="${log.targetId}">
+                                        (ID: <span th:text="${log.targetId}">123</span>)
+                                    </span>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <nav th:if="${totalPages > 1}" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/logs(page=${currentPage - 1}, actionType=${actionType}, adminId=${adminId})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                    class="page-item" th:classappend="${i == currentPage ? 'active' : ''}">
+                                    <a class="page-link" th:href="@{/admin/logs(page=${i}, actionType=${actionType}, adminId=${adminId})}"
+                                       th:text="${i + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/logs(page=${currentPage + 1}, actionType=${actionType}, adminId=${adminId})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

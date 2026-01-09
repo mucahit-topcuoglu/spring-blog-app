@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postlar - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Posts Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="fas fa-file-alt"></i> Post Yönetimi</h1>
+                    <p>Sistemdeki tüm postları yönetin</p>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Başarılı!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Posts Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> Post Listesi</h5>
+                        <span class="badge bg-secondary" th:text="${totalElements + ' post'}">0 post</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Başlık</th>
+                                        <th>Yazar</th>
+                                        <th>Kategori</th>
+                                        <th>Durum</th>
+                                        <th>Görüntülenme</th>
+                                        <th>Tarih</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="post : ${posts}" th:data-href="@{/admin/posts/{id}(id=${post.id})}">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="fas fa-file-alt text-muted" th:if="${post.postType.name() == 'TEXT'}"></i>
+                                                <i class="fas fa-link text-muted" th:if="${post.postType.name() == 'LINK'}"></i>
+                                                <div>
+                                                    <div class="fw-semibold text-truncate" style="max-width: 250px;" 
+                                                         th:text="${post.title}">Başlık</div>
+                                                    <small class="text-muted" th:if="${post.featured}">
+                                                        <i class="fas fa-star text-warning"></i> Öne Çıkan
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span th:text="${post.author?.username}">yazar</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${post.category ?: 'Genel'}">Kategori</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-active" th:if="${post.published}">
+                                                <i class="fas fa-check me-1"></i> Yayında
+                                            </span>
+                                            <span class="status-badge status-inactive" th:unless="${post.published}">
+                                                <i class="fas fa-eye-slash me-1"></i> Taslak
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${post.viewCount ?: 0}">0</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(post.createdAt, 'dd.MM.yyyy')}">01.01.2024</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a th:href="@{/post/{id}(id=${post.id})}" target="_blank"
+                                                   class="btn-action btn-action-view" 
+                                                   data-bs-toggle="tooltip" title="Siteye Git">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                                <a th:href="@{/admin/posts/{id}(id=${post.id})}" 
+                                                   class="btn-action btn-action-edit"
+                                                   data-bs-toggle="tooltip" title="Detay">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <form th:action="@{/admin/posts/{id}/delete(id=${post.id})}" method="post" 
+                                                      style="display: inline;"
+                                                      onsubmit="return confirmDelete('Bu postu silmek istediğinizden emin misiniz?')">
+                                                    <button type="submit" class="btn-action btn-action-delete" 
+                                                            data-bs-toggle="tooltip" title="Sil">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(posts)}">
+                                        <td colspan="7" class="text-center py-5">
+                                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Post bulunamadı</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="card-footer" th:if="${totalPages != null && totalPages > 1}">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/posts(page=${currentPage - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <li class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                                        <a class="page-link" th:href="@{/admin/posts(page=${i})}" th:text="${i + 1}">1</a>
+                                    </li>
+                                </th:block>
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/posts(page=${currentPage + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

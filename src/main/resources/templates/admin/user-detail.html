@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Detayı - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- User Detail Content -->
+            <div class="content-area">
+                <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-2">
+                                <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/admin/users}">Kullanıcılar</a></li>
+                                <li class="breadcrumb-item active" th:text="${user.username}">Kullanıcı</li>
+                            </ol>
+                        </nav>
+                        <h1><i class="fas fa-user"></i> Kullanıcı Detayı</h1>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Başarılı!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- User Profile Card -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="mb-4">
+                                    <div class="user-avatar mx-auto mb-3" 
+                                         th:if="${user.profileImageUrl == null}"
+                                         th:text="${user.initials}"
+                                         style="width: 100px; height: 100px; font-size: 2.5rem; background: var(--admin-primary); color: white;">U</div>
+                                    <img th:if="${user.profileImageUrl != null}" 
+                                         th:src="${user.profileImageUrl}"
+                                         class="rounded-circle"
+                                         style="width: 100px; height: 100px; object-fit: cover;" alt="Avatar">
+                                </div>
+                                <h4 th:text="${user.displayName}">Kullanıcı Adı</h4>
+                                <p class="text-muted" th:text="'@' + ${user.username}">@username</p>
+                                
+                                <div class="d-flex justify-content-center gap-2 mb-3">
+                                    <span class="status-badge status-admin" th:if="${user.role.name() == 'ADMIN'}">
+                                        <i class="fas fa-shield-alt me-1"></i> Admin
+                                    </span>
+                                    <span class="status-badge status-user" th:if="${user.role.name() == 'USER'}">
+                                        <i class="fas fa-user me-1"></i> Kullanıcı
+                                    </span>
+                                    <span class="status-badge status-active" th:if="${user.enabled}">
+                                        <i class="fas fa-check me-1"></i> Aktif
+                                    </span>
+                                    <span class="status-badge status-inactive" th:unless="${user.enabled}">
+                                        <i class="fas fa-ban me-1"></i> Pasif
+                                    </span>
+                                </div>
+                                
+                                <p class="text-muted mb-0" th:if="${user.bio}" th:text="${user.bio}">Bio</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-bolt"></i> Hızlı İşlemler</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Toggle Active -->
+                                <form th:action="@{/admin/users/{id}/toggle-enabled(id=${user.id})}" method="post" class="mb-3">
+                                    <button type="submit" class="btn w-100"
+                                            th:classappend="${user.enabled} ? 'btn-outline-danger' : 'btn-outline-success'">
+                                        <i th:class="${user.enabled} ? 'fas fa-ban' : 'fas fa-check'"></i>
+                                        <span th:text="${user.enabled} ? 'Pasif Yap' : 'Aktif Yap'">Toggle</span>
+                                    </button>
+                                </form>
+                                
+                                <!-- Change Role -->
+                                <form th:action="@{/admin/users/{id}/change-role(id=${user.id})}" method="post" class="mb-3"
+                                      th:if="${user.id != currentAdmin.id}">
+                                    <div class="input-group">
+                                        <select name="role" class="form-select">
+                                            <option value="USER" th:selected="${user.role.name() == 'USER'}">Kullanıcı</option>
+                                            <option value="ADMIN" th:selected="${user.role.name() == 'ADMIN'}">Admin</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-primary">Değiştir</button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Delete User -->
+                                <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
+                                      th:if="${user.id != currentAdmin.id}"
+                                      onsubmit="return confirmDelete('Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fas fa-trash"></i> Kullanıcıyı Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Details -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Kullanıcı Bilgileri</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">Ad</label>
+                                        <p class="mb-0 fw-semibold" th:text="${user.firstName ?: '-'}">Ad</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">Soyad</label>
+                                        <p class="mb-0 fw-semibold" th:text="${user.lastName ?: '-'}">Soyad</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">E-posta</label>
+                                        <p class="mb-0 fw-semibold" th:text="${user.email}">email@example.com</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">Kullanıcı Adı</label>
+                                        <p class="mb-0 fw-semibold" th:text="${user.username}">username</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">Kayıt Tarihi</label>
+                                        <p class="mb-0 fw-semibold" th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small">Post Sayısı</label>
+                                        <p class="mb-0 fw-semibold" th:text="${#lists.size(user.posts)}">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reset Password -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-key"></i> Şifre Sıfırla</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/users/{id}/reset-password(id=${user.id})}" method="post">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Yeni Şifre</label>
+                                            <input type="password" name="newPassword" class="form-control" 
+                                                   placeholder="Yeni şifre girin" required minlength="6">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="submit" class="btn btn-warning w-100">
+                                                <i class="fas fa-sync"></i> Şifreyi Sıfırla
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- User Activity Logs -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-history"></i> Son İşlemler</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>İşlem</th>
+                                                <th>Admin</th>
+                                                <th>Tarih</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="log : ${userLogs}">
+                                                <td th:text="${log.action}">İşlem</td>
+                                                <td><span class="badge bg-secondary" th:text="${log.adminUsername}">admin</span></td>
+                                                <td th:text="${log.formattedDate}">Tarih</td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(userLogs)}">
+                                                <td colspan="3" class="text-center py-4 text-muted">
+                                                    Henüz işlem kaydı yok
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

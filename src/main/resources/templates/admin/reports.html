@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlar - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Reports Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-bar"></i> Raporlar ve İstatistikler</h1>
+                    <p>Sistem genelindeki istatistikleri görüntüleyin</p>
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="stat-card stat-card-primary">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 th:text="${stats.totalUsers}">0</h3>
+                                <p>Toplam Kullanıcı</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="stat-card stat-card-success">
+                            <div class="stat-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 th:text="${stats.totalPosts}">0</h3>
+                                <p>Toplam Post</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="stat-card stat-card-warning">
+                            <div class="stat-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 th:text="${stats.totalComments}">0</h3>
+                                <p>Toplam Yorum</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="stat-card stat-card-danger">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 th:text="${stats.activeUsers}">0</h3>
+                                <p>Aktif Kullanıcı</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Registration Chart -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line"></i> Son 30 Gün Kayıt İstatistikleri</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="registrationChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Distribution -->
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-pie"></i> Kategori Dağılımı</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Stats -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Detaylı İstatistikler</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-4">
+                                    <div class="col-6">
+                                        <div class="border rounded p-3 text-center">
+                                            <h2 class="text-primary" th:text="${stats.newUsersToday}">0</h2>
+                                            <p class="text-muted mb-0">Bugün Kayıt</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="border rounded p-3 text-center">
+                                            <h2 class="text-success" th:text="${stats.newUsersThisMonth}">0</h2>
+                                            <p class="text-muted mb-0">Bu Ay Kayıt</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="border rounded p-3 text-center">
+                                            <h2 class="text-warning" th:text="${stats.publishedPosts}">0</h2>
+                                            <p class="text-muted mb-0">Yayındaki Postlar</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="border rounded p-3 text-center">
+                                            <h2 class="text-danger" th:text="${stats.featuredPosts}">0</h2>
+                                            <p class="text-muted mb-0">Öne Çıkan Postlar</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Registrations -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user-plus"></i> Son Kayıt Olanlar</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Kullanıcı</th>
+                                                <th>E-posta</th>
+                                                <th>Tarih</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="user : ${stats.recentUsers}">
+                                                <td th:text="${user.username}">kullanıcı</td>
+                                                <td th:text="${user.email}">email</td>
+                                                <td th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">tarih</td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(stats.recentUsers)}">
+                                                <td colspan="3" class="text-center py-3 text-muted">
+                                                    Henüz kayıt yok
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+    
+    <script th:inline="javascript">
+        // Registration Chart
+        const registrationData = /*[[${registrationChartData}]]*/ [];
+        const labels = registrationData.map(d => d.date);
+        const data = registrationData.map(d => d.count);
+        
+        new Chart(document.getElementById('registrationChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Yeni Kayıtlar',
+                    data: data,
+                    borderColor: '#e94560',
+                    backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Category Chart
+        const categoryStats = /*[[${stats.categoryStats}]]*/ {};
+        const categoryLabels = Object.keys(categoryStats);
+        const categoryData = Object.values(categoryStats);
+        
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryData,
+                    backgroundColor: [
+                        '#e94560',
+                        '#667eea',
+                        '#48bb78',
+                        '#ed8936',
+                        '#9f7aea',
+                        '#38b2ac',
+                        '#f56565',
+                        '#4299e1'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

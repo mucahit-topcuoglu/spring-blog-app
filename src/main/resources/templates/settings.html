@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/navbar-styles :: navbar-styles}"></th:block>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-900: #1e293b;
+            --gray-800: #334155;
+            --gray-700: #475569;
+            --gray-600: #64748b;
+            --gray-500: #94a3b8;
+            --gray-400: #cbd5e1;
+            --gray-300: #e2e8f0;
+            --gray-200: #f1f5f9;
+            --gray-100: #f8fafc;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+            color: var(--gray-900);
+        }
+
+        .settings-wrapper {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .settings-sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid var(--gray-300);
+            padding: 32px 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-title i {
+            color: var(--primary);
+        }
+
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-500);
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 16px;
+            color: var(--gray-500);
+        }
+
+        .nav-item.danger {
+            color: var(--danger);
+        }
+
+        .nav-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .nav-item.danger i {
+            color: var(--danger);
+        }
+
+        /* Main Content */
+        .settings-main {
+            flex: 1;
+            padding: 32px 48px;
+            max-width: 800px;
+        }
+
+        .settings-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            font-size: 15px;
+            color: var(--gray-600);
+        }
+
+        /* Cards */
+        .settings-card {
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 20px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-300);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--gray-400);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Profile Image Upload */
+        .avatar-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+        }
+
+        .current-avatar {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 4px solid var(--white);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .avatar-badge {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            border: 3px solid var(--white);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .avatar-upload {
+            flex: 1;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        .upload-zone i {
+            font-size: 32px;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .upload-zone h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+        }
+
+        .upload-zone p {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin: 0;
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        .avatar-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            border-color: var(--gray-300);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Toggle Switch */
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .toggle-item:first-child {
+            padding-top: 0;
+        }
+
+        .toggle-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .toggle-info p {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Password Requirements */
+        .password-requirements {
+            background: var(--gray-100);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .password-requirements h5 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 10px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray-600);
+            padding: 4px 0;
+        }
+
+        .requirement i {
+            color: var(--success);
+            font-size: 12px;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            background: rgba(239, 68, 68, 0.05);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .danger-zone .card-title {
+            color: var(--danger);
+        }
+
+        .danger-zone .card-title i {
+            color: var(--danger);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert i {
+            font-size: 18px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-container {
+            background: var(--white);
+            margin: 8% auto;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 28px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .modal-body p {
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 20px 28px 28px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .settings-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .settings-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .settings-main {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .modal-container {
+                margin: 20% 16px;
+            }
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+            z-index: 1000;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+
+    <div class="settings-wrapper">
+        <!-- Sidebar -->
+        <aside class="settings-sidebar" id="settingsSidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">
+                    <i class="fas fa-cog"></i>
+                    Ayarlar
+                </h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Hesap</div>
+                    <button class="nav-item active" onclick="showSection('profile')">
+                        <i class="fas fa-user"></i>
+                        Profil Bilgileri
+                    </button>
+                    <button class="nav-item" onclick="showSection('avatar')">
+                        <i class="fas fa-camera"></i>
+                        Profil Resmi
+                    </button>
+                    <button class="nav-item" onclick="showSection('password')">
+                        <i class="fas fa-lock"></i>
+                        Şifre
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tercihler</div>
+                    <button class="nav-item" onclick="showSection('privacy')">
+                        <i class="fas fa-shield-alt"></i>
+                        Gizlilik
+                    </button>
+                    <button class="nav-item" onclick="showSection('notifications')">
+                        <i class="fas fa-bell"></i>
+                        Bildirimler
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tehlikeli Bölge</div>
+                    <button class="nav-item danger" onclick="showSection('danger')">
+                        <i class="fas fa-trash-alt"></i>
+                        Hesabı Sil
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="settings-main">
+            <div th:if="${successMessage}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- Profile Section -->
+            <section id="profile" class="settings-section active">
+                <div class="section-header">
+                    <h2 class="section-title">Profil Bilgileri</h2>
+                    <p class="section-description">Temel profil bilgilerinizi buradan güncelleyebilirsiniz.</p>
+                </div>
+
+                <form th:action="@{/settings/profile}" method="post">
+                    <div class="settings-card">
+                        <div class="card-title">
+                            <i class="fas fa-id-card"></i>
+                            Kişisel Bilgiler
+                        </div>
+                        <div class="card-description">Adınız profilinizde ve yazılarınızda görünecektir.</div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Ad</label>
+                                <input type="text" name="firstName" class="form-control" 
+                                       th:value="${user.firstName}" placeholder="Adınız" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Soyad</label>
+                                <input type="text" name="lastName" class="form-control" 
+                                       th:value="${user.lastName}" placeholder="Soyadınız" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">E-posta Adresi</label>
+                            <input type="email" name="email" class="form-control" 
+                                   th:value="${user.email}" placeholder="ornek@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Biyografi</label>
+                            <textarea name="bio" class="form-control" 
+                                      placeholder="Kendiniz hakkında birkaç cümle yazın..."
+                                      th:text="${user.bio}"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Değişiklikleri Kaydet
+                    </button>
+                </form>
+            </section>
+
+            <!-- Avatar Section -->
+            <section id="avatar" class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Profil Resmi</h2>
+                    <p class="section-description">Profil resminiz diğer kullanıcılara görünür.</p>
+                </div>
+
+                <div class="settings-card">
+                    <div class="avatar-section">
+                        <div class="current-avatar">
+                            <img th:if="${user.profileImageUrl != null}" 
+                                 th:src="${user.profileImageUrl}" 
+                                 class="avatar-image" 
+                                 id="avatarPreview"
+                                 alt="Avatar">
+                            <div th:if="${user.profileImageUrl == null}" 
+                                 class="avatar-image" 
+                                 id="avatarInitials"
+                                 th:text="${user.initials}">U</div>
+                            <div class="avatar-badge">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+
+                        <div class="avatar-upload">
+                            <form id="avatarForm" enctype="multipart/form-data">
+                                <div class="upload-zone" onclick="document.getElementById('avatarInput').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <h4>Resim yüklemek için tıklayın</h4>
+                                    <p>veya bir URL girin</p>
+                                </div>
+                                <input type="file" id="avatarInput" class="upload-input" 
+                                       accept="image/*" onchange="previewAvatar(event)">
+                            </form>
+                            
+                            <div class="form-group" style="margin-top: 16px;">
+                                <label class="form-label">veya Resim URL'si</label>
+                                <input type="url" id="avatarUrl" class="form-control" 
+                                       th:value="${user.profileImageUrl}"
+                                       placeholder="https://example.com/image.jpg">
+                            </div>
+
+                            <div class="avatar-actions">
+                                <button type="button" class="btn btn-primary" onclick="saveAvatar()">
+                                    <i class="fas fa-save"></i>
+                                    Kaydet
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="removeAvatar()">
+                                    <i class="fas fa-trash"></i>
+                                    Kaldır
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Password Section -->
+            <section id="password" class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Şifre Değiştir</h2>
+                    <p class="section-description">Güvenliğiniz için güçlü bir şifre kullanın.</p>
+                </div>
+
+                <form th:action="@{/settings/password}" method="post">
+                    <div class="settings-card">
+                        <div class="card-title">
+                            <i class="fas fa-key"></i>
+                            Şifre Güncelleme
+                        </div>
+                        <div class="card-description">Şifrenizi değiştirmek için mevcut şifrenizi girin.</div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mevcut Şifre</label>
+                            <input type="password" name="currentPassword" class="form-control" 
+                                   placeholder="••••••••" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Yeni Şifre</label>
+                                <input type="password" name="newPassword" class="form-control" 
+                                       placeholder="••••••••" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Yeni Şifre (Tekrar)</label>
+                                <input type="password" name="confirmPassword" class="form-control" 
+                                       placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="password-requirements">
+                            <h5>Şifre Gereksinimleri</h5>
+                            <div class="requirement">
+                                <i class="fas fa-check-circle"></i>
+                                En az 8 karakter
+                            </div>
+                            <div class="requirement">
+                                <i class="fas fa-check-circle"></i>
+                                En az bir büyük harf
+                            </div>
+                            <div class="requirement">
+                                <i class="fas fa-check-circle"></i>
+                                En az bir rakam
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-lock"></i>
+                        Şifreyi Güncelle
+                    </button>
+                </form>
+            </section>
+
+            <!-- Privacy Section -->
+            <section id="privacy" class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Gizlilik Ayarları</h2>
+                    <p class="section-description">Profilinizin ve içeriklerinizin görünürlüğünü kontrol edin.</p>
+                </div>
+
+                <div class="settings-card">
+                    <div class="card-title">
+                        <i class="fas fa-eye"></i>
+                        Görünürlük
+                    </div>
+                    <div class="card-description">Profilinizin hangi bilgilerinin görüneceğini seçin.</div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Profil Görünürlüğü</h4>
+                            <p>Profilinizi herkes görebilir</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="profileVisibility" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>E-posta Görünürlüğü</h4>
+                            <p>E-posta adresiniz profilinizde görünsün</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailVisibility">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Aktivite Durumu</h4>
+                            <p>Diğer kullanıcılar çevrimiçi durumunuzu görebilir</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="activityStatus" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="savePrivacySettings()">
+                    <i class="fas fa-save"></i>
+                    Gizlilik Ayarlarını Kaydet
+                </button>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications" class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Bildirim Tercihleri</h2>
+                    <p class="section-description">Hangi bildirimleri almak istediğinizi seçin.</p>
+                </div>
+
+                <div class="settings-card">
+                    <div class="card-title">
+                        <i class="fas fa-envelope"></i>
+                        E-posta Bildirimleri
+                    </div>
+                    <div class="card-description">Önemli güncellemeler hakkında e-posta alın.</div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Yorum Bildirimleri</h4>
+                            <p>Yazılarınıza yorum yapıldığında bildirim al</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="commentNotifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Değerlendirme Bildirimleri</h4>
+                            <p>Yazılarınız değerlendirildiğinde bildirim al</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ratingNotifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Takipçi Bildirimleri</h4>
+                            <p>Yeni takipçi kazandığınızda bildirim al</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="followerNotifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Haftalık Özet</h4>
+                            <p>Haftalık aktivite özeti al</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="weeklyDigest">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="saveNotificationSettings()">
+                    <i class="fas fa-save"></i>
+                    Bildirim Ayarlarını Kaydet
+                </button>
+            </section>
+
+            <!-- Danger Zone Section -->
+            <section id="danger" class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Hesabı Sil</h2>
+                    <p class="section-description">Bu işlem geri alınamaz. Dikkatli olun.</p>
+                </div>
+
+                <div class="danger-zone">
+                    <div class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Tehlikeli Bölge
+                    </div>
+                    <div class="card-description">
+                        Hesabınızı sildiğinizde tüm verileriniz kalıcı olarak silinecektir.
+                        Bu işlem geri alınamaz.
+                    </div>
+
+                    <div style="margin: 20px 0; padding: 16px; background: rgba(239, 68, 68, 0.05); border-radius: 10px;">
+                        <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--danger);">Silinecek veriler:</p>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--gray-600); font-size: 14px;">
+                            <li>Tüm yazılarınız ve içerikleriniz</li>
+                            <li>Yorumlarınız ve değerlendirmeleriniz</li>
+                            <li>Profil bilgileriniz</li>
+                            <li>Kayıtlı yer işaretleriniz</li>
+                        </ul>
+                    </div>
+
+                    <button type="button" class="btn btn-danger" onclick="showDeleteModal()">
+                        <i class="fas fa-trash-alt"></i>
+                        Hesabımı Kalıcı Olarak Sil
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-sliders-h"></i>
+    </button>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Hesabı Sil
+                </h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Hesabınızı silmek üzeresiniz. Bu işlem <strong>geri alınamaz</strong>. 
+                    Devam etmek için şifrenizi girin ve onay metnini yazın.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Şifreniz</label>
+                    <input type="password" id="deletePassword" class="form-control" 
+                           placeholder="Şifrenizi girin">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Onaylamak için "HESABIMI SIL" yazın</label>
+                    <input type="text" id="deleteConfirmation" class="form-control" 
+                           placeholder="HESABIMI SIL">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+                    İptal
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteAccount()">
+                    <i class="fas fa-trash-alt"></i>
+                    Hesabı Sil
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar dropdown toggle
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileAvatar = document.querySelector('.profile-avatar');
+            
+            if (dropdown && profileAvatar && !dropdown.contains(event.target) && !profileAvatar.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Section switching
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active to clicked nav item
+            event.currentTarget.classList.add('active');
+
+            // Close mobile sidebar
+            document.getElementById('settingsSidebar').classList.remove('show');
+        }
+
+        // Toggle sidebar for mobile
+        function toggleSidebar() {
+            document.getElementById('settingsSidebar').classList.toggle('show');
+        }
+
+        // Avatar preview
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatarPreview');
+                    const initials = document.getElementById('avatarInitials');
+                    
+                    if (preview) {
+                        preview.src = e.target.result;
+                    } else if (initials) {
+                        // Replace initials div with image
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'avatar-image';
+                        img.id = 'avatarPreview';
+                        img.alt = 'Avatar';
+                        initials.parentNode.replaceChild(img, initials);
+                    }
+                    
+                    // Update URL input
+                    document.getElementById('avatarUrl').value = '';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save avatar
+        function saveAvatar() {
+            const urlInput = document.getElementById('avatarUrl');
+            const fileInput = document.getElementById('avatarInput');
+            
+            let imageUrl = urlInput.value.trim();
+            
+            if (fileInput.files.length > 0) {
+                // File upload - for now we'll just use the URL
+                // In a real app, you'd upload to a server
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                fetch('/settings/upload-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Profil resmi başarıyla güncellendi!');
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Bir hata oluştu: ' + error);
+                });
+            } else if (imageUrl) {
+                // URL based update
+                fetch('/settings/profile-image-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageUrl: imageUrl })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Profil resmi başarıyla güncellendi!');
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + (data.message || 'Bilinmeyen hata'));
+                    }
+                })
+                .catch(error => {
+                    alert('Bir hata oluştu: ' + error);
+                });
+            } else {
+                alert('Lütfen bir resim seçin veya URL girin');
+            }
+        }
+
+        // Remove avatar
+        function removeAvatar() {
+            if (confirm('Profil resminizi kaldırmak istediğinizden emin misiniz?')) {
+                fetch('/settings/remove-image', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Profil resmi kaldırıldı');
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    alert('Bir hata oluştu: ' + error);
+                });
+            }
+        }
+
+        // Delete modal
+        function showDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            document.getElementById('deletePassword').value = '';
+            document.getElementById('deleteConfirmation').value = '';
+        }
+
+        // Gizlilik ayarlarını kaydet
+        function savePrivacySettings() {
+            const settings = {
+                profileVisibility: document.getElementById('profileVisibility').checked,
+                emailVisibility: document.getElementById('emailVisibility').checked,
+                activityStatus: document.getElementById('activityStatus').checked
+            };
+
+            fetch('/settings/privacy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Gizlilik ayarları başarıyla kaydedildi!');
+                } else {
+                    alert('Hata: ' + (data.message || 'Bilinmeyen hata'));
+                }
+            })
+            .catch(error => {
+                alert('Bir hata oluştu: ' + error);
+            });
+        }
+
+        // Bildirim ayarlarını kaydet
+        function saveNotificationSettings() {
+            const settings = {
+                commentNotifications: document.getElementById('commentNotifications').checked,
+                ratingNotifications: document.getElementById('ratingNotifications').checked,
+                followerNotifications: document.getElementById('followerNotifications').checked,
+                weeklyDigest: document.getElementById('weeklyDigest').checked
+            };
+
+            fetch('/settings/notifications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Bildirim ayarları başarıyla kaydedildi!');
+                } else {
+                    alert('Hata: ' + (data.message || 'Bilinmeyen hata'));
+                }
+            })
+            .catch(error => {
+                alert('Bir hata oluştu: ' + error);
+            });
+        }
+
+        function deleteAccount() {
+            const password = document.getElementById('deletePassword').value;
+            const confirmation = document.getElementById('deleteConfirmation').value;
+
+            if (confirmation !== 'HESABIMI SIL') {
+                alert('Lütfen onay metnini doğru yazın');
+                return;
+            }
+
+            if (!password) {
+                alert('Lütfen şifrenizi girin');
+                return;
+            }
+
+            if (confirm('SON UYARI: Hesabınız kalıcı olarak silinecek. Devam etmek istediğinizden emin misiniz?')) {
+                fetch('/settings/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Hesabınız silindi. Hoşça kalın.');
+                        window.location.href = '/';
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Bir hata oluştu: ' + error);
+                });
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                closeDeleteModal();
+            }
+        }
+    </script>
+</body>
+</html>

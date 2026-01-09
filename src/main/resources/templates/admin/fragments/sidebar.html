@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sidebar Fragment</title>
+</head>
+<body>
+    <!-- Admin Sidebar -->
+    <aside class="sidebar" id="sidebar" th:fragment="sidebar">
+        <div class="sidebar-header">
+            <a th:href="@{/admin/dashboard}" class="sidebar-brand">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="sidebar-brand-text">
+                    Admin Panel
+                    <small th:text="${siteName}">Blog Projesi</small>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <!-- Ana Menü -->
+            <div class="menu-section">
+                <div class="menu-section-title">Ana Menü</div>
+                <a th:href="@{/admin/dashboard}" class="menu-item" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            
+            <!-- Yönetim -->
+            <div class="menu-section">
+                <div class="menu-section-title">Yönetim</div>
+                <a th:href="@{/admin/users}" class="menu-item" th:classappend="${activePage == 'users'} ? 'active' : ''">
+                    <i class="fas fa-users"></i>
+                    <span>Kullanıcılar</span>
+                </a>
+                <a th:href="@{/admin/posts}" class="menu-item" th:classappend="${activePage == 'posts'} ? 'active' : ''">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Postlar</span>
+                </a>
+                <a th:href="@{/admin/comments}" class="menu-item" th:classappend="${activePage == 'comments'} ? 'active' : ''">
+                    <i class="fas fa-comments"></i>
+                    <span>Yorumlar</span>
+                </a>
+            </div>
+            
+            <!-- Analiz -->
+            <div class="menu-section">
+                <div class="menu-section-title">Analiz</div>
+                <a th:href="@{/admin/reports}" class="menu-item" th:classappend="${activePage == 'reports'} ? 'active' : ''">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Raporlar</span>
+                </a>
+                <a th:href="@{/admin/logs}" class="menu-item" th:classappend="${activePage == 'logs'} ? 'active' : ''">
+                    <i class="fas fa-history"></i>
+                    <span>İşlem Logları</span>
+                </a>
+            </div>
+            
+            <!-- Sistem -->
+            <div class="menu-section">
+                <div class="menu-section-title">Sistem</div>
+                <a th:href="@{/admin/settings}" class="menu-item" th:classappend="${activePage == 'settings'} ? 'active' : ''">
+                    <i class="fas fa-cog"></i>
+                    <span>Ayarlar</span>
+                </a>
+            </div>
+            
+            <!-- Çıkış -->
+            <div class="menu-section">
+                <div class="menu-section-title">Hesap</div>
+                <a th:href="@{/home}" class="menu-item">
+                    <i class="fas fa-globe"></i>
+                    <span>Siteye Git</span>
+                </a>
+                <form th:action="@{/admin/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="menu-item" style="width: 100%; background: none; border: none; text-align: left; cursor: pointer;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Çıkış Yap</span>
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+</body>
+</html>

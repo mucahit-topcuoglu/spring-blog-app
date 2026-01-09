@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Düzenle - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Edit User Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2">
+                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/admin/users}">Kullanıcılar</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/admin/users/{id}(id=${user.id})}" th:text="${user.username}">Kullanıcı</a></li>
+                            <li class="breadcrumb-item active">Düzenle</li>
+                        </ol>
+                    </nav>
+                    <h1><i class="fas fa-user-edit"></i> Kullanıcı Düzenle</h1>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-edit"></i> Kullanıcı Bilgileri</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/users/{id}/edit(id=${user.id})}" method="post">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Kullanıcı Adı</label>
+                                            <input type="text" class="form-control" th:value="${user.username}" disabled>
+                                            <small class="text-muted">Kullanıcı adı değiştirilemez</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">E-posta <span class="text-danger">*</span></label>
+                                            <input type="email" name="email" class="form-control" 
+                                                   th:value="${user.email}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ad</label>
+                                            <input type="text" name="firstName" class="form-control" 
+                                                   th:value="${user.firstName}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Soyad</label>
+                                            <input type="text" name="lastName" class="form-control" 
+                                                   th:value="${user.lastName}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Biyografi</label>
+                                            <textarea name="bio" class="form-control" rows="3" 
+                                                      th:text="${user.bio}"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4 d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                                        </button>
+                                        <a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i> İptal
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="user-avatar mx-auto mb-3" 
+                                     th:if="${user.profileImageUrl == null}"
+                                     th:text="${user.initials}"
+                                     style="width: 80px; height: 80px; font-size: 2rem; background: var(--admin-primary); color: white;">U</div>
+                                <img th:if="${user.profileImageUrl != null}" 
+                                     th:src="${user.profileImageUrl}"
+                                     class="rounded-circle mb-3"
+                                     style="width: 80px; height: 80px; object-fit: cover;" alt="Avatar">
+                                <h5 th:text="${user.displayName}">Kullanıcı</h5>
+                                <p class="text-muted" th:text="'@' + ${user.username}">@username</p>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <span class="status-badge" 
+                                          th:classappend="${user.role.name() == 'ADMIN'} ? 'status-admin' : 'status-user'"
+                                          th:text="${user.role.name()}">ROLE</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

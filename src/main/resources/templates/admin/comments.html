@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yorumlar - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Comments Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="fas fa-comments"></i> Yorum Yönetimi</h1>
+                    <p>Sistemdeki tüm yorumları yönetin</p>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Başarılı!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Comments Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> Yorum Listesi</h5>
+                        <span class="badge bg-secondary" th:text="${#lists.size(comments) + ' yorum'}">0 yorum</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Kullanıcı</th>
+                                        <th>Yorum</th>
+                                        <th>Post</th>
+                                        <th>Tarih</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="comment : ${comments}">
+                                        <td>
+                                            <span th:text="${comment.user?.username}">kullanıcı</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 300px;" 
+                                                 th:text="${comment.content}">Yorum içeriği</div>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/admin/posts/{id}(id=${comment.post?.id})}"
+                                               class="text-truncate d-block" style="max-width: 200px;"
+                                               th:text="${comment.post?.title}">Post başlığı</a>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a th:href="@{/post/{id}(id=${comment.post?.id})}" target="_blank"
+                                                   class="btn-action btn-action-view" 
+                                                   data-bs-toggle="tooltip" title="Postu Görüntüle">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                                <form th:action="@{/admin/comments/{id}/delete(id=${comment.id})}" method="post" 
+                                                      style="display: inline;"
+                                                      onsubmit="return confirmDelete('Bu yorumu silmek istediğinizden emin misiniz?')">
+                                                    <button type="submit" class="btn-action btn-action-delete" 
+                                                            data-bs-toggle="tooltip" title="Sil">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(comments)}">
+                                        <td colspan="5" class="text-center py-5">
+                                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Yorum bulunamadı</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

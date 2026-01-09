@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Ayarları - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Settings Content -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="fas fa-cog"></i> Sistem Ayarları</h1>
+                    <p>Site ve güvenlik ayarlarını yapılandırın</p>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Ayarlar kaydedildi!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <form th:action="@{/admin/settings}" method="post">
+                    <div class="row g-4">
+                        <!-- General Settings -->
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-globe"></i> Genel Ayarlar</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="siteName" class="form-label">Site Adı</label>
+                                        <input type="text" class="form-control" id="siteName" name="siteName"
+                                               th:value="${settings['site.name']}" placeholder="Blog Sitesi">
+                                        <div class="form-text">Sitenin başlığında görünecek isim</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="siteDescription" class="form-label">Site Açıklaması</label>
+                                        <textarea class="form-control" id="siteDescription" name="siteDescription" rows="3"
+                                                  th:text="${settings['site.description']}" placeholder="Site açıklaması..."></textarea>
+                                        <div class="form-text">SEO için kullanılacak açıklama</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="contactEmail" class="form-label">İletişim E-postası</label>
+                                        <input type="email" class="form-control" id="contactEmail" name="contactEmail"
+                                               th:value="${settings['contact.email']}" placeholder="admin@example.com">
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="maintenanceMode" name="maintenanceMode"
+                                               th:checked="${settings['maintenance.mode'] == 'true'}">
+                                        <label class="form-check-label" for="maintenanceMode">
+                                            <strong>Bakım Modu</strong>
+                                        </label>
+                                        <div class="form-text">Aktif olduğunda kullanıcılar siteye erişemez</div>
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="registrationEnabled" name="registrationEnabled"
+                                               th:checked="${settings['registration.enabled'] != 'false'}">
+                                        <label class="form-check-label" for="registrationEnabled">
+                                            <strong>Yeni Kayıt İzni</strong>
+                                        </label>
+                                        <div class="form-text">Devre dışı bırakıldığında yeni kullanıcılar kayıt olamaz</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-shield-alt"></i> Güvenlik Ayarları</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="maxLoginAttempts" class="form-label">Maksimum Giriş Denemesi</label>
+                                        <input type="number" class="form-control" id="maxLoginAttempts" name="maxLoginAttempts"
+                                               th:value="${settings['security.max.login.attempts'] ?: 5}" min="1" max="20">
+                                        <div class="form-text">Hesap kilitlenmeden önce izin verilen deneme sayısı</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="lockoutDuration" class="form-label">Kilitleme Süresi (dakika)</label>
+                                        <input type="number" class="form-control" id="lockoutDuration" name="lockoutDuration"
+                                               th:value="${settings['security.lockout.duration'] ?: 30}" min="1" max="1440">
+                                        <div class="form-text">Başarısız giriş sonrası bekleme süresi</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="sessionTimeout" class="form-label">Oturum Zaman Aşımı (dakika)</label>
+                                        <input type="number" class="form-control" id="sessionTimeout" name="sessionTimeout"
+                                               th:value="${settings['security.session.timeout'] ?: 60}" min="5" max="480">
+                                        <div class="form-text">Hareketsizlik sonrası otomatik çıkış süresi</div>
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="forceHttps" name="forceHttps"
+                                               th:checked="${settings['security.force.https'] == 'true'}">
+                                        <label class="form-check-label" for="forceHttps">
+                                            <strong>HTTPS Zorunlu</strong>
+                                        </label>
+                                        <div class="form-text">Tüm bağlantıları HTTPS'ye yönlendir</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content Settings -->
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-file-alt"></i> İçerik Ayarları</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="postsPerPage" class="form-label">Sayfa Başı Post Sayısı</label>
+                                        <input type="number" class="form-control" id="postsPerPage" name="postsPerPage"
+                                               th:value="${settings['content.posts.per.page'] ?: 10}" min="5" max="50">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="minPostLength" class="form-label">Minimum Post Uzunluğu (karakter)</label>
+                                        <input type="number" class="form-control" id="minPostLength" name="minPostLength"
+                                               th:value="${settings['content.min.post.length'] ?: 100}" min="10" max="1000">
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="commentsEnabled" name="commentsEnabled"
+                                               th:checked="${settings['content.comments.enabled'] != 'false'}">
+                                        <label class="form-check-label" for="commentsEnabled">
+                                            <strong>Yorumlara İzin Ver</strong>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="moderateComments" name="moderateComments"
+                                               th:checked="${settings['content.moderate.comments'] == 'true'}">
+                                        <label class="form-check-label" for="moderateComments">
+                                            <strong>Yorum Moderasyonu</strong>
+                                        </label>
+                                        <div class="form-text">Yorumlar yayınlanmadan önce onay bekler</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Settings -->
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-envelope"></i> E-posta Ayarları</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="smtpHost" class="form-label">SMTP Sunucu</label>
+                                        <input type="text" class="form-control" id="smtpHost" name="smtpHost"
+                                               th:value="${settings['email.smtp.host']}" placeholder="smtp.gmail.com">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="smtpPort" class="form-label">SMTP Port</label>
+                                        <input type="number" class="form-control" id="smtpPort" name="smtpPort"
+                                               th:value="${settings['email.smtp.port'] ?: 587}" min="1" max="65535">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="smtpUsername" class="form-label">SMTP Kullanıcı Adı</label>
+                                        <input type="text" class="form-control" id="smtpUsername" name="smtpUsername"
+                                               th:value="${settings['email.smtp.username']}" placeholder="noreply@example.com">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="smtpPassword" class="form-label">SMTP Şifre</label>
+                                        <input type="password" class="form-control" id="smtpPassword" name="smtpPassword"
+                                               placeholder="••••••••">
+                                        <div class="form-text">Değiştirmek istemiyorsanız boş bırakın</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Ayarları Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

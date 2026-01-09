@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Detayı - Admin Paneli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{admin/fragments/admin-styles :: styles}"></th:block>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <th:block th:replace="~{admin/fragments/topbar :: topbar}"></th:block>
+            
+            <!-- Post Detail Content -->
+            <div class="content-area">
+                <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-2">
+                                <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/admin/posts}">Postlar</a></li>
+                                <li class="breadcrumb-item active">Detay</li>
+                            </ol>
+                        </nav>
+                        <h1><i class="fas fa-file-alt"></i> Post Detayı</h1>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/post/{id}(id=${post.id})}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-external-link-alt"></i> Siteye Git
+                        </a>
+                        <a th:href="@{/admin/posts}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Başarılı!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Hata!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Post Content -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Post İçeriği</h5>
+                            </div>
+                            <div class="card-body">
+                                <h3 th:text="${post.title}">Post Başlığı</h3>
+                                
+                                <div class="d-flex gap-3 my-3 flex-wrap">
+                                    <span class="badge bg-secondary" th:text="${post.category ?: 'Genel'}">Kategori</span>
+                                    <span class="badge" 
+                                          th:classappend="${post.postType.name() == 'TEXT'} ? 'bg-info' : 'bg-warning'"
+                                          th:text="${post.postType.name()}">TYPE</span>
+                                    <span class="badge bg-success" th:if="${post.published}">Yayında</span>
+                                    <span class="badge bg-danger" th:unless="${post.published}">Taslak</span>
+                                    <span class="badge bg-warning" th:if="${post.featured}">
+                                        <i class="fas fa-star"></i> Öne Çıkan
+                                    </span>
+                                </div>
+                                
+                                <div th:if="${post.url}" class="mb-3">
+                                    <strong>URL:</strong> 
+                                    <a th:href="${post.url}" target="_blank" th:text="${post.url}">Link</a>
+                                </div>
+                                
+                                <div class="border rounded p-3 bg-light">
+                                    <div th:utext="${post.content}" style="white-space: pre-wrap;">İçerik</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Comments -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-comments"></i> Yorumlar (<span th:text="${#lists.size(post.comments)}">0</span>)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:each="comment : ${post.comments}" class="border-bottom py-3">
+                                    <div class="d-flex justify-content-between">
+                                        <strong th:text="${comment.user?.username}">Kullanıcı</strong>
+                                        <small class="text-muted" th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">Tarih</small>
+                                    </div>
+                                    <p class="mb-0 mt-2" th:text="${comment.content}">Yorum içeriği</p>
+                                </div>
+                                <div th:if="${#lists.isEmpty(post.comments)}" class="text-center py-4 text-muted">
+                                    <i class="fas fa-comments fa-2x mb-2"></i>
+                                    <p class="mb-0">Henüz yorum yok</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="col-lg-4">
+                        <!-- Post Info -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-bar"></i> İstatistikler</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Görüntülenme</span>
+                                    <strong th:text="${post.viewCount ?: 0}">0</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Yorum Sayısı</span>
+                                    <strong th:text="${#lists.size(post.comments)}">0</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Oluşturulma</span>
+                                    <strong th:text="${#temporals.format(post.createdAt, 'dd.MM.yyyy')}">Tarih</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Yazar</span>
+                                    <strong th:text="${post.author?.username}">yazar</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-bolt"></i> Hızlı İşlemler</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Toggle Published -->
+                                <form th:action="@{/admin/posts/{id}/toggle-published(id=${post.id})}" method="post" class="mb-3">
+                                    <button type="submit" class="btn w-100"
+                                            th:classappend="${post.published} ? 'btn-outline-warning' : 'btn-outline-success'">
+                                        <i th:class="${post.published} ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                                        <span th:text="${post.published} ? 'Gizle' : 'Yayınla'">Toggle</span>
+                                    </button>
+                                </form>
+                                
+                                <!-- Toggle Featured -->
+                                <form th:action="@{/admin/posts/{id}/toggle-featured(id=${post.id})}" method="post" class="mb-3">
+                                    <button type="submit" class="btn w-100"
+                                            th:classappend="${post.featured} ? 'btn-warning' : 'btn-outline-warning'">
+                                        <i class="fas fa-star"></i>
+                                        <span th:text="${post.featured} ? 'Öne Çıkarmayı Kaldır' : 'Öne Çıkar'">Toggle</span>
+                                    </button>
+                                </form>
+                                
+                                <!-- Delete Post -->
+                                <form th:action="@{/admin/posts/{id}/delete(id=${post.id})}" method="post"
+                                      onsubmit="return confirmDelete('Bu postu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fas fa-trash"></i> Postu Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block th:replace="~{admin/fragments/admin-scripts :: scripts}"></th:block>
+</body>
+</html>

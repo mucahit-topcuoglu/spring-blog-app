@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konular - Blog Projesi</title>
+    
+    <!-- CSRF Token removed - not using Spring Security -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Navbar Styles -->
+    <div th:replace="~{fragments/navbar-styles :: navbar-styles}"></div>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            line-height: 1.6;
+        }
+        
+        /* Navbar Stilleri */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .navbar-custom {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .navbar-scrolled {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 12px 0;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            margin-right: 10px;
+            color: white;
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 5px;
+        }
+        
+        .nav-menu li {
+            display: inline-block;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-login, .btn-register {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-login {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-login:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .dropdown-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .dropdown-header .user-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .dropdown-header .user-email {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .dropdown-body {
+            padding: 5px 0;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 8px 0;
+        }
+        
+        .navbar-nav .nav-link {
+            color: #4a5568 !important;
+            font-weight: 500;
+            margin: 0 15px;
+            padding: 8px 0 !important;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: #667eea !important;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .profile-dropdown {
+            position: relative;
+        }
+        
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-btn:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.05);
+        }
+        
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .dropdown-menu-custom {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: none;
+            padding: 10px 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-menu-custom.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item-custom {
+            padding: 12px 20px;
+            color: #4a5568;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item-custom:hover {
+            background-color: #f8fafc;
+            color: #667eea;
+        }
+        
+        .dropdown-item-custom i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .dropdown-divider-custom {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 8px 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 0 20px;
+        }
+        
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Search Bar */
+        .search-section {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            margin-bottom: 50px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        /* Topics Grid */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .topic-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            --topic-color-1: #667eea;
+            --topic-color-2: #764ba2;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .topic-header {
+            padding: 25px;
+            background: linear-gradient(135deg, var(--topic-color-1), var(--topic-color-2));
+            color: white;
+            position: relative;
+        }
+        
+        .topic-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .topic-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            color: white;
+        }
+        
+        .topic-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .topic-description {
+            opacity: 0.9;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .topic-content {
+            padding: 25px;
+        }
+        
+        .topic-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .topic-stat {
+            text-align: center;
+        }
+        
+        .topic-stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .topic-stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .recent-posts {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+        }
+        
+        .recent-posts-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
+        .recent-post-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .recent-post-item:hover {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+        
+        .recent-post-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            width: 100%;
+        }
+        
+        .recent-post-link:hover {
+            text-decoration: none;
+        }
+        
+        .recent-post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .recent-post-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .recent-post-title {
+            font-size: 0.85rem;
+            color: #2d3748;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .recent-post-meta {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+        
+        /* Topic Color Variables */
+        .topic-teknoloji, .topic-tech {
+            --topic-color-1: #667eea;
+            --topic-color-2: #764ba2;
+        }
+        
+        .topic-tasarım, .topic-tasarim, .topic-design {
+            --topic-color-1: #f093fb;
+            --topic-color-2: #f5576c;
+        }
+        
+        .topic-yazılım, .topic-yazilim, .topic-software {
+            --topic-color-1: #4facfe;
+            --topic-color-2: #00f2fe;
+        }
+        
+        .topic-web {
+            --topic-color-1: #11998e;
+            --topic-color-2: #38ef7d;
+        }
+        
+        .topic-mobil, .topic-mobile {
+            --topic-color-1: #ee0979;
+            --topic-color-2: #ff6a00;
+        }
+        
+        .topic-yapay-zeka, .topic-ai {
+            --topic-color-1: #8e2de2;
+            --topic-color-2: #4a00e0;
+        }
+        
+        .topic-blockchain {
+            --topic-color-1: #f7971e;
+            --topic-color-2: #ffd200;
+        }
+        
+        .topic-kişisel, .topic-kisisel, .topic-personal {
+            --topic-color-1: #43e97b;
+            --topic-color-2: #38f9d7;
+        }
+        
+        .topic-iş-dünyası, .topic-business {
+            --topic-color-1: #4facfe;
+            --topic-color-2: #00f2fe;
+        }
+        
+        .topic-lifestyle {
+            --topic-color-1: #43e97b;
+            --topic-color-2: #38f9d7;
+        }
+        
+        .topic-seyahat, .topic-travel {
+            --topic-color-1: #fa709a;
+            --topic-color-2: #fee140;
+        }
+        
+        .topic-yemek, .topic-food {
+            --topic-color-1: #ff9a9e;
+            --topic-color-2: #fecfef;
+        }
+        
+        .topic-sağlık, .topic-saglik, .topic-health {
+            --topic-color-1: #a8edea;
+            --topic-color-2: #fed6e3;
+        }
+        
+        .topic-eğitim, .topic-egitim, .topic-education {
+            --topic-color-1: #89f7fe;
+            --topic-color-2: #66a6ff;
+        }
+        
+        .topic-spor, .topic-sports {
+            --topic-color-1: #f857a6;
+            --topic-color-2: #ff5858;
+        }
+        
+        .topic-müzik, .topic-muzik, .topic-music {
+            --topic-color-1: #6a11cb;
+            --topic-color-2: #2575fc;
+        }
+        
+        .topic-film, .topic-sinema, .topic-movies {
+            --topic-color-1: #232526;
+            --topic-color-2: #414345;
+        }
+        
+        .topic-kitap, .topic-books {
+            --topic-color-1: #c94b4b;
+            --topic-color-2: #4b134f;
+        }
+        
+        .topic-oyun, .topic-gaming {
+            --topic-color-1: #00b09b;
+            --topic-color-2: #96c93d;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons .btn {
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .view-options .btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .view-options .btn.active {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        
+        /* Topic Action Buttons */
+        .topic-content .btn {
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .topic-content .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #718096;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                display: none;
+            }
+            
+            .main-content {
+                margin-top: 80px;
+                padding: 0 15px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .topics-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .topic-header {
+                padding: 20px;
+            }
+            
+            .topic-content {
+                padding: 20px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .topic-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .topic-card:nth-child(2) { animation-delay: 0.1s; }
+        .topic-card:nth-child(3) { animation-delay: 0.2s; }
+        .topic-card:nth-child(4) { animation-delay: 0.3s; }
+        .topic-card:nth-child(5) { animation-delay: 0.4s; }
+        .topic-card:nth-child(6) { animation-delay: 0.5s; }
+        .topic-card:nth-child(7) { animation-delay: 0.6s; }
+        .topic-card:nth-child(8) { animation-delay: 0.7s; }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar(activePage='topics')}"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-custom">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Konular</h1>
+                <p class="page-subtitle">İlgi alanınıza göre blog kategorilerini keşfedin ve takip edin</p>
+            </div>
+            
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Konu ara..." id="searchInput" onkeyup="searchTopics()">
+                </div>
+            </div>
+            
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalTopics} ?: 0">0</div>
+                        <div class="stat-label">Toplam Konu</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalPosts} ?: 0">0</div>
+                        <div class="stat-label">Toplam Yazı</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalAuthors} ?: 0">0</div>
+                        <div class="stat-label">Aktif Yazar</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Navigation -->
+            <div class="quick-nav-section" style="margin-bottom: 30px;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="nav-buttons">
+                        <a href="/home" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Ana Sayfaya Dön
+                        </a>
+                        <button class="btn btn-primary" onclick="window.location.href='/write'">
+                            <i class="fas fa-plus me-2"></i>Yeni Yazı Yaz
+                        </button>
+                    </div>
+                    <div class="view-options">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" onclick="toggleView('grid')">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topics Grid -->
+            <div class="topics-grid" id="topicsGrid">
+                <!-- Dinamik Kategoriler -->
+                <div class="topic-card" th:each="category : ${categories}" th:data-category="${category}">
+                    <div class="topic-header">
+                        <div class="topic-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <h3 class="topic-name" th:text="${category}">Kategori</h3>
+                        <p class="topic-description">Bu kategorideki yazıları keşfedin</p>
+                    </div>
+                    <div class="topic-content">
+                        <div class="topic-stats">
+                            <div class="topic-stat">
+                                <div class="topic-stat-number" th:text="${categoryCount.get(category)} ?: 0">0</div>
+                                <div class="topic-stat-label">Yazı</div>
+                            </div>
+                        </div>
+                        <div class="recent-posts" th:if="${categoryRecentPosts.get(category) != null and !categoryRecentPosts.get(category).isEmpty()}">
+                            <div class="recent-posts-title">Son Yazılar</div>
+                            <div class="recent-post-item" th:each="post : ${categoryRecentPosts.get(category)}">
+                                <a th:href="@{/post/{id}(id=${post.id})}" class="recent-post-link">
+                                    <div class="recent-post-avatar" th:text="${post.author.initials}">A</div>
+                                    <div class="recent-post-info">
+                                        <div class="recent-post-title" th:text="${#strings.abbreviate(post.title, 30)}">Yazı Başlığı</div>
+                                        <div class="recent-post-meta" th:text="${post.relativeTime}">2 saat önce</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a th:href="@{/home(category=${category})}" class="btn btn-sm btn-outline-primary">
+                                    Tüm Yazıları Gör <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="recent-posts" th:if="${categoryRecentPosts.get(category) == null or categoryRecentPosts.get(category).isEmpty()}">
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p class="mb-0">Henüz yazı yok</p>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a th:href="@{/write}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-pen me-1"></i>İlk Yazıyı Yaz
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kategori yoksa -->
+                <div class="empty-state text-center py-5" th:if="${categories == null or categories.isEmpty()}">
+                    <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+                    <h3>Henüz kategori yok</h3>
+                    <p class="text-muted">İlk yazınızı yazarak bir kategori oluşturun!</p>
+                    <a th:href="@{/write}" class="btn btn-primary mt-3">
+                        <i class="fas fa-pen me-2"></i>Yeni Yazı Yaz
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar-custom');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        });
+        
+        // Profile dropdown toggle
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileBtn = document.querySelector('.profile-btn');
+            
+            if (!profileBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Search topics function
+        function searchTopics() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const topicCards = document.querySelectorAll('.topic-card');
+            
+            topicCards.forEach(card => {
+                const topicName = card.querySelector('.topic-name').textContent.toLowerCase();
+                const topicDescription = card.querySelector('.topic-description').textContent.toLowerCase();
+                
+                if (topicName.includes(searchTerm) || topicDescription.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeInUp 0.3s ease forwards';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show empty state if no results
+            const visibleCards = Array.from(topicCards).filter(card => card.style.display !== 'none');
+            const topicsGrid = document.getElementById('topicsGrid');
+            
+            // Remove existing empty state
+            const existingEmptyState = document.querySelector('.empty-state');
+            if (existingEmptyState) {
+                existingEmptyState.remove();
+            }
+            
+            if (visibleCards.length === 0 && searchTerm) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <h3>Sonuç bulunamadı</h3>
+                    <p>"${searchTerm}" için herhangi bir konu bulunamadı.</p>
+                `;
+                topicsGrid.appendChild(emptyState);
+            }
+        }
+        
+        // Go to topic page
+        function goToTopic(topicSlug) {
+            // Show notification and navigate
+            showNotification(`${getTopicName(topicSlug)} yazılarını görüntülüyorsunuz...`, 'info');
+            
+            setTimeout(() => {
+                // In a real application, this would navigate to a topic-specific page
+                // For now, redirect to index with topic filter
+                window.location.href = `/home?topic=${topicSlug}`;
+            }, 1000);
+        }
+        
+        // Get topic name by slug
+        function getTopicName(slug) {
+            const topicNames = {
+                'technology': 'Teknoloji',
+                'design': 'Tasarım',
+                'business': 'İş Dünyası',
+                'lifestyle': 'Yaşam Tarzı',
+                'travel': 'Seyahat',
+                'food': 'Yemek',
+                'health': 'Sağlık',
+                'education': 'Eğitim'
+            };
+            return topicNames[slug] || 'Kategori';
+        }
+        
+        // Toggle view between grid and list
+        function toggleView(viewType) {
+            const gridElement = document.getElementById('topicsGrid');
+            const buttons = document.querySelectorAll('.view-options .btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (viewType === 'list') {
+                gridElement.style.gridTemplateColumns = '1fr';
+                gridElement.style.gap = '15px';
+                
+                // Make cards horizontal
+                const cards = document.querySelectorAll('.topic-card');
+                cards.forEach(card => {
+                    card.style.display = 'flex';
+                    card.style.maxWidth = 'none';
+                    
+                    const header = card.querySelector('.topic-header');
+                    const content = card.querySelector('.topic-content');
+                    
+                    header.style.flex = '0 0 200px';
+                    content.style.flex = '1';
+                });
+            } else {
+                // Reset to grid view
+                gridElement.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
+                gridElement.style.gap = '25px';
+                
+                const cards = document.querySelectorAll('.topic-card');
+                cards.forEach(card => {
+                    card.style.display = 'block';
+                    card.style.maxWidth = '';
+                    
+                    const header = card.querySelector('.topic-header');
+                    const content = card.querySelector('.topic-content');
+                    
+                    header.style.flex = '';
+                    content.style.flex = '';
+                });
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                // Clear login status
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userFirstName');
+                
+                showNotification('Çıkış yapılıyor...', 'info');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+            }
+        }
+        
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            let alertClass = 'alert-info';
+            let iconClass = 'info-circle';
+            
+            if (type === 'success') {
+                alertClass = 'alert-success';
+                iconClass = 'check-circle';
+            } else if (type === 'error') {
+                alertClass = 'alert-danger';
+                iconClass = 'exclamation-circle';
+            }
+            
+            notification.className = `alert ${alertClass} position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideInRight 0.3s ease;
+                border: none;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${iconClass} me-2"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            // Escape to clear search and close dropdown
+            if (e.key === 'Escape') {
+                document.getElementById('searchInput').value = '';
+                searchTopics();
+                document.getElementById('profileDropdown').classList.remove('show');
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userFirstName');
+                localStorage.removeItem('userEmail');
+                window.location.href = '/login';
+            }
+        }
+
+        // Kategori renkleri
+        const categoryColors = {
+            'teknoloji': { color1: '#667eea', color2: '#764ba2' },
+            'tech': { color1: '#667eea', color2: '#764ba2' },
+            'tasarım': { color1: '#f093fb', color2: '#f5576c' },
+            'tasarim': { color1: '#f093fb', color2: '#f5576c' },
+            'design': { color1: '#f093fb', color2: '#f5576c' },
+            'yazılım': { color1: '#4facfe', color2: '#00f2fe' },
+            'yazilim': { color1: '#4facfe', color2: '#00f2fe' },
+            'software': { color1: '#4facfe', color2: '#00f2fe' },
+            'web': { color1: '#11998e', color2: '#38ef7d' },
+            'mobil': { color1: '#ee0979', color2: '#ff6a00' },
+            'mobile': { color1: '#ee0979', color2: '#ff6a00' },
+            'yapay zeka': { color1: '#8e2de2', color2: '#4a00e0' },
+            'ai': { color1: '#8e2de2', color2: '#4a00e0' },
+            'blockchain': { color1: '#f7971e', color2: '#ffd200' },
+            'kişisel': { color1: '#43e97b', color2: '#38f9d7' },
+            'kisisel': { color1: '#43e97b', color2: '#38f9d7' },
+            'personal': { color1: '#43e97b', color2: '#38f9d7' },
+            'iş dünyası': { color1: '#4facfe', color2: '#00f2fe' },
+            'is dunyasi': { color1: '#4facfe', color2: '#00f2fe' },
+            'business': { color1: '#4facfe', color2: '#00f2fe' },
+            'yaşam tarzı': { color1: '#43e97b', color2: '#38f9d7' },
+            'lifestyle': { color1: '#43e97b', color2: '#38f9d7' },
+            'seyahat': { color1: '#fa709a', color2: '#fee140' },
+            'travel': { color1: '#fa709a', color2: '#fee140' },
+            'yemek': { color1: '#ff9a9e', color2: '#fecfef' },
+            'food': { color1: '#ff9a9e', color2: '#fecfef' },
+            'sağlık': { color1: '#a8edea', color2: '#fed6e3' },
+            'saglik': { color1: '#a8edea', color2: '#fed6e3' },
+            'health': { color1: '#a8edea', color2: '#fed6e3' },
+            'eğitim': { color1: '#89f7fe', color2: '#66a6ff' },
+            'egitim': { color1: '#89f7fe', color2: '#66a6ff' },
+            'education': { color1: '#89f7fe', color2: '#66a6ff' },
+            'spor': { color1: '#f857a6', color2: '#ff5858' },
+            'sports': { color1: '#f857a6', color2: '#ff5858' },
+            'müzik': { color1: '#6a11cb', color2: '#2575fc' },
+            'muzik': { color1: '#6a11cb', color2: '#2575fc' },
+            'music': { color1: '#6a11cb', color2: '#2575fc' },
+            'film': { color1: '#232526', color2: '#414345' },
+            'sinema': { color1: '#232526', color2: '#414345' },
+            'movies': { color1: '#232526', color2: '#414345' },
+            'kitap': { color1: '#c94b4b', color2: '#4b134f' },
+            'books': { color1: '#c94b4b', color2: '#4b134f' },
+            'oyun': { color1: '#00b09b', color2: '#96c93d' },
+            'gaming': { color1: '#00b09b', color2: '#96c93d' }
+        };
+        
+        // Kategori ikonları
+        const categoryIcons = {
+            'teknoloji': 'fa-laptop-code',
+            'tech': 'fa-laptop-code',
+            'tasarım': 'fa-palette',
+            'tasarim': 'fa-palette',
+            'design': 'fa-palette',
+            'yazılım': 'fa-code',
+            'yazilim': 'fa-code',
+            'software': 'fa-code',
+            'web': 'fa-globe',
+            'mobil': 'fa-mobile-alt',
+            'mobile': 'fa-mobile-alt',
+            'yapay zeka': 'fa-robot',
+            'ai': 'fa-robot',
+            'blockchain': 'fa-link',
+            'kişisel': 'fa-user',
+            'kisisel': 'fa-user',
+            'personal': 'fa-user',
+            'iş dünyası': 'fa-briefcase',
+            'is dunyasi': 'fa-briefcase',
+            'business': 'fa-briefcase',
+            'yaşam tarzı': 'fa-heart',
+            'lifestyle': 'fa-heart',
+            'seyahat': 'fa-plane',
+            'travel': 'fa-plane',
+            'yemek': 'fa-utensils',
+            'food': 'fa-utensils',
+            'sağlık': 'fa-heartbeat',
+            'saglik': 'fa-heartbeat',
+            'health': 'fa-heartbeat',
+            'eğitim': 'fa-graduation-cap',
+            'egitim': 'fa-graduation-cap',
+            'education': 'fa-graduation-cap',
+            'spor': 'fa-running',
+            'sports': 'fa-running',
+            'müzik': 'fa-music',
+            'muzik': 'fa-music',
+            'music': 'fa-music',
+            'film': 'fa-film',
+            'sinema': 'fa-film',
+            'movies': 'fa-film',
+            'kitap': 'fa-book',
+            'books': 'fa-book',
+            'oyun': 'fa-gamepad',
+            'gaming': 'fa-gamepad'
+        };
+        
+        // Rastgele renk paleti (tanımlı olmayan kategoriler için)
+        const randomColors = [
+            { color1: '#667eea', color2: '#764ba2' },
+            { color1: '#f093fb', color2: '#f5576c' },
+            { color1: '#4facfe', color2: '#00f2fe' },
+            { color1: '#11998e', color2: '#38ef7d' },
+            { color1: '#ee0979', color2: '#ff6a00' },
+            { color1: '#8e2de2', color2: '#4a00e0' },
+            { color1: '#fa709a', color2: '#fee140' },
+            { color1: '#43e97b', color2: '#38f9d7' },
+            { color1: '#89f7fe', color2: '#66a6ff' },
+            { color1: '#f857a6', color2: '#ff5858' }
+        ];
+        
+        // Kategori rengini al
+        function getCategoryColor(categoryName) {
+            const normalizedName = categoryName.toLowerCase().trim();
+            if (categoryColors[normalizedName]) {
+                return categoryColors[normalizedName];
+            }
+            // Hash fonksiyonu ile tutarlı rastgele renk
+            let hash = 0;
+            for (let i = 0; i < normalizedName.length; i++) {
+                hash = normalizedName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return randomColors[Math.abs(hash) % randomColors.length];
+        }
+        
+        // Kategori ikonunu al
+        function getCategoryIcon(categoryName) {
+            const normalizedName = categoryName.toLowerCase().trim();
+            return categoryIcons[normalizedName] || 'fa-folder';
+        }
+        
+        // Initialize animations on page load
+        window.addEventListener('load', function() {
+            // Load user info for dropdown
+            const userFirstName = localStorage.getItem('userFirstName');
+            const userEmail = localStorage.getItem('userEmail') || 'user@email.com';
+            
+            if (userFirstName) {
+                document.getElementById('userAvatar').textContent = userFirstName.charAt(0).toUpperCase();
+                document.getElementById('userName').textContent = userFirstName;
+                document.getElementById('userEmail').textContent = userEmail;
+            }
+            
+            const topicCards = document.querySelectorAll('.topic-card');
+            topicCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                // Kategori adını al ve rengi uygula
+                const categoryName = card.getAttribute('data-category') || '';
+                const topicNameElement = card.querySelector('.topic-name');
+                
+                if (categoryName) {
+                    const colors = getCategoryColor(categoryName);
+                    card.style.setProperty('--topic-color-1', colors.color1);
+                    card.style.setProperty('--topic-color-2', colors.color2);
+                    
+                    // İkonu güncelle
+                    const iconElement = card.querySelector('.topic-icon i');
+                    if (iconElement) {
+                        const iconClass = getCategoryIcon(categoryName);
+                        iconElement.className = 'fas ' + iconClass;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
