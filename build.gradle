@@ -51,3 +51,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// Disable plain jar - only create executable jar
+jar {
+    enabled = false
+}
