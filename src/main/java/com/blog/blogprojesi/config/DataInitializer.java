@@ -79,44 +79,60 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(admin);
         log.info("Admin kullanıcısı oluşturuldu: admin / admin123");
 
-        // Normal kullanıcı oluştur
+        // Örnek kullanıcılar
         User user1 = User.builder()
-                .username("ahmet")
-                .email("ahmet@blog.com")
-                .password(passwordEncoder.encode("ahmet123"))
-                .firstName("Ahmet")
-                .lastName("Yılmaz")
+                .username("mucahit")
+                .email("mucahit@blog.com")
+                .password(passwordEncoder.encode("123456"))
+                .firstName("Mücahit")
+                .lastName("Topçuoğlu")
                 .role(Role.USER)
-                .bio("Yazılım geliştirici ve blog yazarı")
+                .bio("Yazılım öğrencisi, web geliştirme ve AI ile ilgileniyorum")
                 .isEnabled(true)
                 .build();
         userRepository.save(user1);
-        log.info("Kullanıcı oluşturuldu: ahmet / ahmet123");
+        log.info("Kullanıcı oluşturuldu: mucahit / 123456");
 
         User user2 = User.builder()
-                .username("zeynep")
-                .email("zeynep@blog.com")
-                .password(passwordEncoder.encode("zeynep123"))
-                .firstName("Zeynep")
-                .lastName("Kaya")
+                .username("suna")
+                .email("suna@blog.com")
+                .password(passwordEncoder.encode("123456"))
+                .firstName("Suna")
+                .lastName("Şalgalı")
                 .role(Role.USER)
-                .bio("Teknoloji meraklısı")
+                .bio("Öğrenci - Teknoloji ve tasarım tutkunu")
                 .isEnabled(true)
                 .build();
         userRepository.save(user2);
-        log.info("Kullanıcı oluşturuldu: zeynep / zeynep123");
+        log.info("Kullanıcı oluşturuldu: suna / 123456");
 
-        // Örnek TEXT postlar
+        User user3 = User.builder()
+                .username("deneme")
+                .email("deneme@blog.com")
+                .password(passwordEncoder.encode("123456"))
+                .firstName("Deneme")
+                .lastName("Kullanıcı")
+                .role(Role.USER)
+                .bio("Test kullanıcısı")
+                .isEnabled(true)
+                .build();
+        userRepository.save(user3);
+        log.info("Kullanıcı oluşturuldu: deneme / 123456");
+
+        // Örnek blog postları
         Post post1 = Post.builder()
-                .title("Spring Boot ile Web Geliştirme")
-                .content("Spring Boot, Java tabanlı web uygulamaları geliştirmek için harika bir framework'tür.\n\n" +
-                        "## Neden Spring Boot?\n\n" +
-                        "1. **Hızlı başlangıç**: Auto-configuration sayesinde minimum konfigürasyon ile çalışmaya başlayabilirsiniz.\n" +
-                        "2. **Gömülü sunucu**: Tomcat, Jetty veya Undertow ile birlikte gelir.\n" +
-                        "3. **Production-ready**: Actuator ile monitoring ve yönetim özellikleri sunar.\n\n" +
-                        "Spring Boot ile geliştirme yapmak gerçekten keyifli!")
+                .title("İlk Deneme Yazım - Railway Deploy Süreci")
+                .content("Bugün ilk kez Railway'e proje deploy ettim. Sanırım başarılı oldu!\n\n" +
+                        "## Yaşadığım Sorunlar\n\n" +
+                        "PostgreSQL bağlantısı kurarken biraz zorlandım ama sonunda çözdüm. Environment variable'ları " +
+                        "doğru ayarlamak çok önemliymiş. PGHOST, PGPORT gibi değişkenleri tek tek eklemek gerekiyormuş.\n\n" +
+                        "## Öğrendiklerim\n\n" +
+                        "- Railway ücretsiz plan 500 saat/ay sunuyormuş\n" +
+                        "- GitHub'a push yapınca otomatik deploy oluyor\n" +
+                        "- PostgreSQL içinde hazır geliyor\n\n" +
+                        "Şimdi sırada projeye yeni özellikler eklemek var!")
                 .postType(PostType.TEXT)
-                .category("Teknoloji")
+                .category("Deneyimler")
                 .author(user1)
                 .isPublished(true)
                 .isFeatured(true)
@@ -125,18 +141,19 @@ public class DataInitializer implements CommandLineRunner {
         postRepository.save(post1);
 
         Post post2 = Post.builder()
-                .title("PostgreSQL Veritabanı Optimizasyonu")
-                .content("PostgreSQL performansını artırmak için kullanabileceğiniz teknikler:\n\n" +
-                        "## 1. Index Kullanımı\n\n" +
-                        "Sık sorguladığınız alanlar için index oluşturun.\n\n" +
-                        "## 2. EXPLAIN ANALYZE\n\n" +
-                        "Sorgularınızın performansını analiz edin.\n\n" +
-                        "## 3. Connection Pooling\n\n" +
-                        "HikariCP gibi connection pool kütüphaneleri kullanın.\n\n" +
-                        "Bu teknikler uygulamanızın veritabanı performansını önemli ölçüde artıracaktır.")
+                .title("Spring Boot Öğrenirken Notlarım")
+                .content("Spring Boot öğrenmeye yeni başladım. İlk izlenimlerim:\n\n" +
+                        "**Artıları:**\n" +
+                        "- Auto-configuration çok pratik\n" +
+                        "- Embedded Tomcat sayesinde ekstra server kurmaya gerek yok\n" +
+                        "- JPA ile database işlemleri çok kolay\n\n" +
+                        "**Zorluklar:**\n" +
+                        "- Annotation'lar başta kafa karıştırıcı olabiliyor\n" +
+                        "- Security konfigürasyonu biraz karmaşık\n\n" +
+                        "Ama genel olarak öğrenmesi keyifli bir framework!")
                 .postType(PostType.TEXT)
-                .category("Veritabanı")
-                .author(admin)
+                .category("Öğrenim")
+                .author(user2)
                 .isPublished(true)
                 .isFeatured(false)
                 .commentsEnabled(true)
@@ -144,17 +161,19 @@ public class DataInitializer implements CommandLineRunner {
         postRepository.save(post2);
 
         Post post3 = Post.builder()
-                .title("Modern CSS Teknikleri")
-                .content("CSS ile yapabileceğiniz harika şeyler:\n\n" +
-                        "## Flexbox\n\n" +
-                        "Esnek düzenler için flexbox kullanın.\n\n" +
-                        "## CSS Grid\n\n" +
-                        "Karmaşık grid layoutları için CSS Grid kullanın.\n\n" +
-                        "## CSS Variables\n\n" +
-                        "Tema değişkenleri için CSS Custom Properties kullanın.\n\n" +
-                        "Modern CSS özellikleri ile responsive ve güzel tasarımlar oluşturabilirsiniz!")
+                .title("CSS Grid ile Layout Denemeleri")
+                .content("Bu hafta CSS Grid öğrenmeye çalışıyorum. Flexbox'tan sonra Grid öğrenmek biraz daha kolay oldu.\n\n" +
+                        "```css\n" +
+                        ".container {\n" +
+                        "  display: grid;\n" +
+                        "  grid-template-columns: repeat(3, 1fr);\n" +
+                        "  gap: 20px;\n" +
+                        "}\n" +
+                        "```\n\n" +
+                        "Bu kadar basit bir kod ile responsive layout yapabiliyorsunuz. Harika!\n\n" +
+                        "Haftaya Grid ile daha karmaşık layoutlar deneyeceğim.")
                 .postType(PostType.TEXT)
-                .category("Web Tasarım")
+                .category("Web Design")
                 .author(user2)
                 .isPublished(true)
                 .isFeatured(true)
@@ -162,11 +181,82 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
         postRepository.save(post3);
 
-        // Örnek LINK post
+        Post post4 = Post.builder()
+                .title("Bugün JavaScript Promise'leri anlamaya çalıştım")
+                .content("JavaScript'te asynchronous işlemler başta kafamı karıştırmıştı ama Promise'leri anladıktan sonra her şey yerine oturdu.\n\n" +
+                        "Callback hell'den kurtulmak için Promise kullanmak gerçekten mantıklı. Async/await ile de daha da okunabilir hale geliyor.\n\n" +
+                        "Yarın fetch API ile bir deneme yapacağım.")
+                .postType(PostType.TEXT)
+                .category("JavaScript")
+                .author(user1)
+                .isPublished(true)
+                .isFeatured(false)
+                .commentsEnabled(true)
+                .build();
+        postRepository.save(post4);
+
+        Post post5 = Post.builder()
+                .title("Test Yazısı - Silme İşlevi Denemesi")
+                .content("Bu yazıyı silme özelliğini test etmek için yazdım.\n\nSonra sileceğim muhtemelen...")
+                .postType(PostType.TEXT)
+                .category("Test")
+                .author(user3)
+                .isPublished(true)
+                .isFeatured(false)
+                .commentsEnabled(true)
+                .build();
+        postRepository.save(post5);
+
+        Post post6 = Post.builder()
+                .title("PostgreSQL vs MySQL - Hangisi Daha İyi?")
+                .content("Okul projesinde PostgreSQL kullanıyoruz ama merak ettim MySQL ile farkları neler?\n\n" +
+                        "Araştırdığım kadarıyla:\n" +
+                        "- PostgreSQL daha fazla SQL standardına uygun\n" +
+                        "- JSON desteği daha iyi\n" +
+                        "- Karmaşık sorgularda daha performanslı\n\n" +
+                        "Ama MySQL'in de PHP ile entegrasyonu daha yaygınmış. Henüz net karar veremedim.")
+                .postType(PostType.TEXT)
+                .category("Veritabanı")
+                .author(user1)
+                .isPublished(true)
+                .isFeatured(false)
+                .commentsEnabled(true)
+                .build();
+        postRepository.save(post6);
+
+        Post post7 = Post.builder()
+                .title("React Hook'ları Öğreniyorum")
+                .content("useState ve useEffect hook'larını kullanmaya başladım.\n\n" +
+                        "Class component'lerden fonksiyonel component'lere geçiş yapmak başta garip geldi ama şimdi daha mantıklı geliyor.\n\n" +
+                        "useEffect dependency array'i konusu biraz kafa karıştırıcı, tekrar tekrar dökümantasyona bakmam gerekiyor.")
+                .postType(PostType.TEXT)
+                .category("React")
+                .author(user2)
+                .isPublished(true)
+                .isFeatured(false)
+                .commentsEnabled(true)
+                .build();
+        postRepository.save(post7);
+
+        // Draft (yayınlanmamış) yazı
+        Post draftPost = Post.builder()
+                .title("Taslak: Git Branch Stratejileri")
+                .content("Bu yazıyı henüz bitirmedim. Git Flow ve trunk-based development hakkında araştırma yapıyorum.\n\n" +
+                        "Daha sonra tamamlayacağım...")
+                .postType(PostType.TEXT)
+                .category("Git")
+                .author(user1)
+                .isPublished(false)
+                .isFeatured(false)
+                .commentsEnabled(true)
+                .build();
+        postRepository.save(draftPost);
+
+        // Link paylaşımı
         Post linkPost = Post.builder()
-                .title("Spring Boot Resmi Dokümantasyonu")
-                .content("Spring Boot'un resmi dokümantasyonu için harika bir kaynak. Başlangıç rehberleri ve detaylı API referansları içerir.")
-                .url("https://spring.io/projects/spring-boot")
+                .title("Faydalı: Spring Boot Best Practices")
+                .content("Spring Boot için çok iyi bir rehber buldum. Özellikle security ve testing kısımları detaylı anlatılmış.")
+                .url("https://spring.io/guides")
                 .postType(PostType.LINK)
                 .category("Kaynaklar")
                 .author(user1)
@@ -176,6 +266,6 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
         postRepository.save(linkPost);
 
-        log.info("4 örnek post oluşturuldu.");
+        log.info("9 örnek post oluşturuldu (8 yayınlanmış, 1 taslak).");
     }
 }
